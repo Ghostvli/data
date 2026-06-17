@@ -57,7 +57,10 @@ public class ImgUtil {
 
     public static void load(Context context, String url, CustomTarget<Drawable> target) {
         try {
-            Glide.with(context).load(getUrl(url)).override(ResUtil.getScreenWidth(), ResUtil.getScreenHeight()).error(R.drawable.artwork).into(target);
+            Glide.with(context)
+                .load(getUrl(url))
+                .override(ResUtil.getScreenWidth(), ResUtil.getScreenHeight())
+                .into(target);
         } catch (Throwable e) {
             e.printStackTrace();
         }

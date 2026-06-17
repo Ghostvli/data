@@ -82,28 +82,49 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
         if (ua.isEmpty()) ua = "Mozilla/5.0";
         String lavfOpts = "stimeout=15000000,headers=User-Agent: " + ua;
         if (decode == HARD) {
-            String vo = android.os.Process.is64Bit() ? "gpu" : "mediacodec_embed";
-            return new String[]{
-                "vo", vo, "gpu-context", "android", "hwdec", "mediacodec",
-                "hwdec-codecs", "all", "keep-open", "yes", "force-seekable", "yes",
-                "keepaspect", "yes", "keepaspect-window", "no",
-                "deband", "no", "interpolation", "no",
-                "cache", "yes", "demuxer-max-bytes", "50MiB",
-                "demuxer-max-back-bytes", "25MiB", "cache-secs", "10",
-                "cache-pause-initial", "yes",
-                "framedrop", "vo", "video-sync", "audio",
-                "hr-seek", "no", "hr-seek-framedrop", "yes",
-                "osd-level", "0", "osd-duration", "500",
-                "vd-lavc-skiploopfilter", "all", "vd-lavc-skipframe", "nonref",
-                "ad-lavc-ac3drc", "0", "audio-buffer", "0.25",
-                "demuxer-lavf-error-resilient", "yes",
-                "demuxer-lavf-allow-mimetype", "no",
-                "demuxer-lavf-analyzeduration", "10000000",
-                "demuxer-lavf-probesize", "50000000",
-                "ao", "audiotrack",
-                "rtsp-transport", rtsp,
-                "demuxer-lavf-o", lavfOpts,
-            };
+            if (android.os.Process.is64Bit()) {
+                // 64位：gpu 模式，高质量硬解码
+                return new String[]{
+                    "vo", "gpu", "gpu-context", "android", "hwdec", "mediacodec",
+                    "hwdec-codecs", "all", "keep-open", "yes", "force-seekable", "yes",
+                    "keepaspect", "yes", "keepaspect-window", "no",
+                    "deband", "no", "interpolation", "no",
+                    "cache", "yes", "demuxer-max-bytes", "50MiB",
+                    "demuxer-max-back-bytes", "25MiB", "cache-secs", "10",
+                    "cache-pause-initial", "yes",
+                    "framedrop", "vo", "video-sync", "audio",
+                    "hr-seek", "no", "hr-seek-framedrop", "yes",
+                    "osd-level", "0", "osd-duration", "500",
+                    "vd-lavc-skiploopfilter", "all", "vd-lavc-skipframe", "nonref",
+                    "ad-lavc-ac3drc", "0", "audio-buffer", "0.25",
+                    "demuxer-lavf-error-resilient", "yes",
+                    "demuxer-lavf-allow-mimetype", "no",
+                    "demuxer-lavf-analyzeduration", "10000000",
+                    "demuxer-lavf-probesize", "50000000",
+                    "ao", "audiotrack",
+                    "rtsp-transport", rtsp,
+                    "demuxer-lavf-o", lavfOpts,
+                };
+            } else {
+                // 32位：mediacodec_embed 模式，节省内存，优化起播速度
+                return new String[]{
+                    "vo", "mediacodec_embed", "hwdec", "mediacodec",
+                    "hwdec-codecs", "all", "keep-open", "yes", "force-seekable", "yes",
+                    "keepaspect", "yes", "keepaspect-window", "no",
+                    "deband", "no", "interpolation", "no",
+                    "cache", "yes", "demuxer-max-bytes", "50MiB",
+                    "demuxer-max-back-bytes", "10MiB", "cache-secs", "2",
+                    "cache-pause-initial", "no",
+                    "framedrop", "vo",
+                    "vd-lavc-skiploopfilter", "nonref",
+                    "demuxer-lavf-error-resilient", "yes",
+                    "demuxer-lavf-analyzeduration", "1000000",
+                    "demuxer-lavf-probesize", "1000000",
+                    "ao", "audiotrack",
+                    "rtsp-transport", rtsp,
+                    "demuxer-lavf-o", lavfOpts,
+                };
+            }
         } else {
             return new String[]{
                 "vo", "gpu", "hwdec", "no",

@@ -25,10 +25,19 @@
 -keep class okio.** { *; }
 -keep class okhttp3.** { *; }
 
-# CatVod
+# CatVod & ZTE IPTV Auth
 -keep class com.github.catvod.Proxy { *; }
 -keep class com.github.catvod.crawler.** { *; }
--keep class * extends com.github.catvod.crawler.Spider
+-keep class com.github.catvod.spider.** { *; }
+-keep class com.github.catvod.utils.** { *; }
+-keep class * extends com.github.catvod.crawler.Spider { *; }
+
+# ZTE Custom App Additions
+-keep class com.fongmi.android.tv.server.process.Ts { *; }
+-keep class com.fongmi.android.tv.utils.LogcatHelper { *; }
+
+# MPV Player (Native JNI Bridge)
+-keep class is.xyz.mpv.** { *; }
 
 # Jianpian
 -keep class com.p2p.** { *; }
