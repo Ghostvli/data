@@ -371,10 +371,13 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void toggleDecode() {
+        // 保存当前位置，切换解码后恢复到该位置
+        long currentPosition = engine.getPosition();
         if (isMpv()) {
             int newDecode = engine.isHard() ? PlayerEngine.SOFT : PlayerEngine.HARD;
             Setting.putMpvDecode(newDecode);
             engine.setDecode(newDecode);
+            engine.setPendingSeekPosition(currentPosition);
             engine.start(spec);
         } else {
             engine.setDecode(engine.isHard() ? PlayerEngine.SOFT : PlayerEngine.HARD);

@@ -365,8 +365,13 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
             onReclaim();
         }
         if (mBlackOverlay != null) {
-            mBlackOverlay.setVisibility(android.view.View.VISIBLE);
-            getExoView().postDelayed(() -> mBlackOverlay.setVisibility(android.view.View.GONE), 500);
+            // MPV播放器从PiP恢复时不显示黑屏，避免短暂黑屏
+            if (mService != null && player().isMpv()) {
+                mBlackOverlay.setVisibility(android.view.View.GONE);
+            } else {
+                mBlackOverlay.setVisibility(android.view.View.VISIBLE);
+                getExoView().postDelayed(() -> mBlackOverlay.setVisibility(android.view.View.GONE), 500);
+            }
         }
     }
 

@@ -71,6 +71,8 @@ public interface PlayerEngine {
 
     float getSpeed();
 
+    void setPendingSeekPosition(long positionMs);
+
     enum ErrorAction {
         RECOVERED,
         DECODE,

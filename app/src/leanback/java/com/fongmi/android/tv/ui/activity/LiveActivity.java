@@ -172,6 +172,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
         setRecyclerView();
         setVideoView();
         setViewModel();
+        mBinding.progress.getRoot().setBackgroundColor(0xFF000000);
     }
 
     @Override

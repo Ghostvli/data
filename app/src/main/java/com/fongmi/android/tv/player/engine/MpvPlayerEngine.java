@@ -42,8 +42,10 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
     private volatile float speed;
     private volatile boolean playing;
     private volatile boolean mpvDone;
+    private volatile boolean switchingChannel;
     private boolean fileLoaded;
     private Long pendingSeekPosition;
+    private boolean keepPendingSeek;
     private int autoReconnectCount = 0;
     private com.fongmi.android.tv.utils.ZteNatPuncher zteNatPuncher;
     private boolean mIsLive;
@@ -68,7 +70,9 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
         this.mpvView = view;
         MPV mpv = view.getMpv();
         if (decode == HARD) {
-            view.setVo(android.os.Process.is64Bit() ? "gpu" : "mediacodec_embed");
+            // 统一使用vo=gpu+hwdec=mediacodec，避免mediacodec_embed的Surface管理问题
+            // mediacodec_embed在频道切换时stop/loadfile会破坏Surface绑定导致黑屏
+            view.setVo("gpu");
         } else {
             view.setVo("gpu");
         }
@@ -83,7 +87,7 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
         String lavfOpts = "stimeout=15000000,headers=User-Agent: " + ua;
         if (decode == HARD) {
             if (android.os.Process.is64Bit()) {
-                // 64位：gpu 模式，高质量硬解码
+                // 64位：gpu模式，硬解码
                 return new String[]{
                     "vo", "gpu", "gpu-context", "android", "hwdec", "mediacodec",
                     "hwdec-codecs", "all", "keep-open", "yes", "force-seekable", "yes",
@@ -91,11 +95,11 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
                     "deband", "no", "interpolation", "no",
                     "cache", "yes", "demuxer-max-bytes", "50MiB",
                     "demuxer-max-back-bytes", "25MiB", "cache-secs", "10",
-                    "cache-pause-initial", "yes",
+                    "cache-pause-initial", "no",
                     "framedrop", "vo", "video-sync", "audio",
                     "hr-seek", "no", "hr-seek-framedrop", "yes",
                     "osd-level", "0", "osd-duration", "500",
-                    "vd-lavc-skiploopfilter", "all", "vd-lavc-skipframe", "nonref",
+                    "vd-lavc-skiploopfilter", "all",
                     "ad-lavc-ac3drc", "0", "audio-buffer", "0.25",
                     "demuxer-lavf-error-resilient", "yes",
                     "demuxer-lavf-allow-mimetype", "no",
@@ -106,37 +110,43 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
                     "demuxer-lavf-o", lavfOpts,
                 };
             } else {
-                // 32位：mediacodec_embed 模式，节省内存，优化起播速度
+                // 32位：与64位完全一致的参数，仅缓冲区更小适配低内存设备
                 return new String[]{
-                    "vo", "mediacodec_embed", "hwdec", "mediacodec",
+                    "vo", "gpu", "gpu-context", "android", "hwdec", "mediacodec",
                     "hwdec-codecs", "all", "keep-open", "yes", "force-seekable", "yes",
                     "keepaspect", "yes", "keepaspect-window", "no",
                     "deband", "no", "interpolation", "no",
                     "cache", "yes", "demuxer-max-bytes", "50MiB",
                     "demuxer-max-back-bytes", "10MiB", "cache-secs", "2",
                     "cache-pause-initial", "no",
-                    "framedrop", "vo",
-                    "vd-lavc-skiploopfilter", "nonref",
+                    "framedrop", "vo", "video-sync", "audio",
+                    "hr-seek", "no", "hr-seek-framedrop", "yes",
+                    "osd-level", "0", "osd-duration", "500",
+                    "vd-lavc-skiploopfilter", "all",
+                    "ad-lavc-ac3drc", "0", "audio-buffer", "0.25",
                     "demuxer-lavf-error-resilient", "yes",
-                    "demuxer-lavf-analyzeduration", "1000000",
-                    "demuxer-lavf-probesize", "1000000",
+                    "demuxer-lavf-allow-mimetype", "no",
+                    "demuxer-lavf-analyzeduration", "10000000",
+                    "demuxer-lavf-probesize", "50000000",
                     "ao", "audiotrack",
                     "rtsp-transport", rtsp,
                     "demuxer-lavf-o", lavfOpts,
                 };
             }
         } else {
+            // 软解码：多线程解码，不跳帧避免绿屏
             return new String[]{
                 "vo", "gpu", "hwdec", "no",
                 "gpu-context", "android", "gpu-hwdecode-interop", "auto",
                 "opengl-swapinterval", "1", "opengl-pbo", "yes",
                 "hwdec-codecs", "all", "keep-open", "yes", "force-seekable", "yes",
-                "keepaspect", "yes", "keepaspect-window", "no",
+                "keepaspect", "yes", "keepaspect-window", "yes",
                 "deband", "no", "interpolation", "no",
                 "cache", "yes", "demuxer-max-bytes", "50MiB",
                 "demuxer-max-back-bytes", "10MiB", "cache-secs", "2",
                 "cache-pause-initial", "no",
-                "framedrop", "vo",
+                "framedrop", "decoder",
+                "vd-lavc-threads", "4",
                 "vd-lavc-skiploopfilter", "nonref",
                 "demuxer-lavf-error-resilient", "yes",
                 "demuxer-lavf-analyzeduration", "1000000",
@@ -185,6 +195,7 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
     @Override public void setDecode(int d) { this.decode = d; Setting.putMpvDecode(d); }
     @Override public boolean isHard() { return decode == HARD; }
     @Override public String getDecodeText() { return ResUtil.getStringArray(R.array.select_decode)[decode]; }
+    @Override public void setPendingSeekPosition(long positionMs) { this.pendingSeekPosition = positionMs; this.keepPendingSeek = true; }
 
     // ── Scale ───────────────────────────────────────────────────
     @Override
@@ -196,7 +207,6 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
 
     private void applyScale(MPV m, int scale) {
         try {
-            boolean hw = "mediacodec_embed".equals(m.getPropertyString("vo"));
             int targetWidth = -1;
             int targetHeight = -1;
             if (scale == 0) {
@@ -205,37 +215,26 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
                 if (w != null && w > 0 && h != null && h > 0) {
                     targetWidth = w;
                     targetHeight = h;
-                    if (hw) m.setPropertyString("android-surface-size", w + "x" + h);
-                    else m.setPropertyDouble("video-aspect-override", (double) w / h);
+                    m.setPropertyDouble("video-aspect-override", (double) w / h);
                 } else {
-                    if (!hw) m.setPropertyString("video-aspect-override", "no");
+                    m.setPropertyString("video-aspect-override", "no");
                 }
             } else if (scale == 1) {
                 targetWidth = 16;
                 targetHeight = 9;
-                if (hw) m.setPropertyString("android-surface-size", "16x9");
-                else m.setPropertyDouble("video-aspect-override", 1.7777777777777777d);
+                m.setPropertyDouble("video-aspect-override", 1.7777777777777777d);
             } else if (scale == 2) {
                 targetWidth = 4;
                 targetHeight = 3;
-                if (hw) m.setPropertyString("android-surface-size", "4x3");
-                else m.setPropertyDouble("video-aspect-override", 1.3333333333333333d);
+                m.setPropertyDouble("video-aspect-override", 1.3333333333333333d);
             } else if (scale == 3) {
-                if (hw) {
-                    m.setPropertyString("android-surface-size", "-1x-1");
-                } else {
-                    m.setPropertyString("video-aspect-override", "no");
-                    m.command("set", "panscan", "1.0");
-                }
+                m.setPropertyString("video-aspect-override", "no");
+                m.command("set", "panscan", "1.0");
             } else if (scale == 4) {
-                if (hw) {
-                    m.setPropertyString("android-surface-size", "-1x-1");
-                } else {
-                    m.setPropertyString("video-aspect-override", "no");
-                    m.command("set", "panscan", "0.5");
-                }
+                m.setPropertyString("video-aspect-override", "no");
+                m.command("set", "panscan", "0.5");
             }
-            if (!hw && scale < 3) m.command("set", "panscan", "0.0");
+            if (scale < 3) m.command("set", "panscan", "0.0");
 
             mpvPlayer.notifyVideoSizeChanged(targetWidth, targetHeight);
         } catch (Throwable ignored) {}
@@ -246,9 +245,12 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
         this.spec = spec;
         this.playing = true;
         this.mpvDone = false;
+        this.switchingChannel = true; // 标记正在切换频道，防止stop触发的END_FILE导致自动重连
         this.fileLoaded = false;
         this.mIsLive = spec != null && spec.getUrl() != null && spec.getUrl().startsWith("rtsp://") && !spec.getUrl().toLowerCase(Locale.ROOT).contains("playseek") && !spec.getUrl().toLowerCase(Locale.ROOT).contains("tvdr");
-        this.pendingSeekPosition = null;
+        // 正常频道切换时清除pendingSeekPosition，toggleDecode设置的保留
+        if (!keepPendingSeek) this.pendingSeekPosition = null;
+        keepPendingSeek = false;
         this.playbackState = Player.STATE_BUFFERING;
         Logger.t("SWITCH_TEST").d("start() state=BUFFERING, mpvDone=" + mpvDone);
         if (spec.getMetadata() != null) {
@@ -272,10 +274,7 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
                 new Thread(() -> {
                     String urlCopy = finalUrlStr;
                     if (mpvDone) return;
-                    try { 
-                        String vo = (decode == HARD && !android.os.Process.is64Bit()) ? "mediacodec_embed" : "gpu";
-                        m.setPropertyString("vo", vo); 
-                    } catch (Throwable ignored) {}
+                    try { m.setPropertyString("vo", "gpu"); } catch (Throwable ignored) {}
                     try { m.setPropertyString("ao", "audiotrack"); } catch (Throwable ignored) {}
                     try {
                         Map<String, String> headers = spec.getHeaders();
@@ -297,7 +296,12 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
                         try {
                             m.setPropertyString("profile", "fast");
                         } catch (Throwable ignored) {}
+                        
                         if (urlCopy != null && urlCopy.startsWith("rtsp://")) {
+                            m.setOptionString("demuxer-max-bytes", "5MiB");
+                            m.setOptionString("demuxer-max-back-bytes", "1MiB");
+                            m.setOptionString("cache", "no");
+                            
                             boolean zteNat = com.fongmi.android.tv.Setting.getZteNatAuto();
                             if (spec.getHeaders() != null) {
                                 for (Map.Entry<String, String> entry : spec.getHeaders().entrySet()) {
@@ -307,9 +311,7 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
                                 }
                             }
                             if (zteNat) {
-                                if (zteNatPuncher != null) {
-                                    zteNatPuncher.stop();
-                                }
+                                if (zteNatPuncher != null) zteNatPuncher.stop();
                                 zteNatPuncher = new com.fongmi.android.tv.utils.ZteNatPuncher();
                                 zteNatPuncher.start(urlCopy, zteNat);
                                 urlCopy = zteNatPuncher.getProxyUrl(urlCopy);
@@ -319,6 +321,14 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
                             } else {
                                 m.setOptionString("demuxer-lavf-o", "fflags=+nofillin");
                             }
+                        } else if (mIsLive) {
+                            m.setOptionString("demuxer-lavf-analyzeduration", "100000");
+                            m.setOptionString("demuxer-lavf-probesize", "300000");
+                            m.setOptionString("cache-pause-initial", "no");
+                            m.setOptionString("cache-secs", "2");
+                            m.setOptionString("demuxer-max-bytes", "10MiB");
+                            m.setOptionString("demuxer-max-back-bytes", "2MiB");
+                            m.setOptionString("cache", "yes");
                         } else {
                             StringBuilder lavfOpts = new StringBuilder("stimeout=15000000");
                             lavfOpts.append(",probesize=1048576,analyzeduration=1000000");
@@ -600,7 +610,6 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
         });
     }
     private long pauseTime;
-
     @Override public void play() {
         onMain(() -> {
             MPV m = mpvView != null ? mpvView.getMpv() : null;
@@ -611,6 +620,7 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
                 pauseTime = 0;
                 String url = spec != null ? spec.getUrl() : "";
                 boolean isRtsp = url != null && url.startsWith("rtsp://");
+                // RTSP长暂停：恢复vo/ao并触发刷新
                 if (isRtsp && pausedDuration > 15000) {
                     if (m != null) {
                         new Thread(() -> {
@@ -622,6 +632,7 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
                     com.fongmi.android.tv.App.post(() -> com.fongmi.android.tv.event.RefreshEvent.player(), 0);
                     return;
                 }
+                // RTSP短暂停：seek + 恢复vo/ao + 取消暂停
                 if (isRtsp && m != null) {
                     final long seekTo = pausePosition;
                     pausePosition = -1;
@@ -667,6 +678,7 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
                 if (isRtsp) {
                     pausePosition = getPosition();
                     new Thread(() -> {
+                        try { m.setPropertyBoolean("pause", true); } catch (Throwable ignored) {}
                         try { m.setPropertyString("vo", "null"); } catch (Throwable ignored) {}
                         try { m.setPropertyString("ao", "null"); } catch (Throwable ignored) {}
                     }, "MPV-Pause").start();
@@ -692,6 +704,7 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
                 boolean isRtsp = url.startsWith("rtsp://");
                 if (isRtsp) {
                     new Thread(() -> {
+                        try { m.setPropertyBoolean("pause", true); } catch (Throwable ignored) {}
                         try { m.setPropertyString("vo", "null"); } catch (Throwable ignored) {}
                         try { m.setPropertyString("ao", "null"); } catch (Throwable ignored) {}
                     }, "MPV-Stop").start();
@@ -757,8 +770,9 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
                 long dur = getDuration();
                 if (dur <= 0) mIsLive = true;
                 Logger.t("MPV_SWITCH").d("event FILE_LOADED(8), duration=" + dur + "ms, isLive=" + mIsLive);
+                switchingChannel = false; // 新文件已加载，频道切换完成
                 playing = true;
-                readVideoSize();
+                
                 mpvPlayer.updateTimeline(dur);
                 mpvPlayer.notifyTracksChanged(getCurrentTracks());
                 mpvPlayer.notifyIsPlayingChanged(true);
@@ -775,7 +789,6 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
                                 if (!isLive) m.setPropertyString("hr-seek", "yes");
                             } catch (Throwable ignored) {}
                         }, "MPV-Init").start();
-                        // If there is still a pending seek for some reason (e.g. called after start), execute it
                         if (pendingSeekPosition != null && pendingSeekPosition > 0) {
                             long seekPos = pendingSeekPosition;
                             pendingSeekPosition = null;
@@ -786,20 +799,32 @@ public class MpvPlayerEngine implements PlayerEngine, MPV.EventObserver {
                         }
                     }
                 } catch (Throwable ignored) {}
-
+                
+                readVideoSize();
+                // FILE_LOADED后延迟恢复alpha，直播流不会触发PLAYBACK_RESTART
+                // 延迟300ms确保mediacodec_embed已渲染首帧到Surface
+                if (mpvView != null) {
+                    mpvView.postDelayed(() -> mpvView.onFirstFrameRendered(), 300);
+                }
+            } else if (eventId == 21) { // PLAYBACK_RESTART
                 playbackState = Player.STATE_READY;
                 mpvPlayer.notifyPlaybackStateChanged(Player.STATE_READY);
                 mpvPlayer.notifyRenderedFirstFrame();
-            } else if (eventId == 21) { // PLAYBACK_RESTART
-                // No longer needed
+                // 新流首帧已渲染，恢复SurfaceView可见，解决频道切换时旧帧残留问题
+                if (mpvView != null) mpvView.onFirstFrameRendered();
             } else if (eventId == 12) { // END_FILE
                 long reason = -1;
                 if (node != null && node.get("reason") != null) {
                     Long r = node.get("reason").asInt();
                     if (r != null) reason = r;
                 }
-                Logger.t("MPV_SWITCH").d("event END_FILE(12), reason=" + reason + ", mpvDone=" + mpvDone);
+                Logger.t("MPV_SWITCH").d("event END_FILE(12), reason=" + reason + ", mpvDone=" + mpvDone + ", switchingChannel=" + switchingChannel);
                 if (mpvDone) return;
+                // 切换频道时playFile中的stop会触发END_FILE，忽略它避免自动重连
+                if (switchingChannel) {
+                    Logger.t("MPV_SWITCH").d("END_FILE ignored during channel switch");
+                    return;
+                }
                 if (reason == 1 || reason == 2 || reason == 3) return;
 
                 boolean isUnexpected = false;

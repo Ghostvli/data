@@ -83,10 +83,19 @@ public class BaseMPVView extends SurfaceView implements SurfaceHolder.Callback {
         if (getHolder().getSurface() != null && getHolder().getSurface().isValid()) {
             final String file = pendingFile;
             this.pendingFile = null;
-            new Thread(() -> {
-                mpv.command("loadfile", file);
-            }, "MPV-LoadFile").start();
+            // vo=gpu模式下直接loadfile，GPU渲染器会自动用新帧覆盖旧帧
+            // 不需要alpha隐藏、stop、lockCanvas等workaround
+            new Thread(() -> mpv.command("loadfile", file), "MPV-LoadFile").start();
         }
+    }
+
+    /** 新流首帧渲染完成后调用，恢复视频可见 */
+    public void onFirstFrameRendered() {
+        if (alphaSafetyTimeout != null) {
+            removeCallbacks(alphaSafetyTimeout);
+            alphaSafetyTimeout = null;
+        }
+        post(() -> setAlpha(1f));
     }
 
     public void setVo(String vo) {
@@ -120,16 +129,15 @@ public class BaseMPVView extends SurfaceView implements SurfaceHolder.Callback {
             try {
                 Boolean paused = mpv.getPropertyBoolean("pause");
                 if (paused != null && paused) {
-                    Double duration = mpv.getPropertyDouble("duration");
-                    boolean isLive = duration == null || duration <= 0;
-                    if (!isLive) {
-                        new Thread(() -> {
-                            try {
-                                mpv.command("frame-step");
-                                mpv.command("frame-back-step");
-                            } catch (Throwable ignored) {}
-                        }, "MPV-FrameStep").start();
-                    }
+                    // 暂停状态下Surface尺寸变化时，延迟刷新当前帧
+                    // 延迟确保GPU渲染管线已稳定（特别是RTSP流vo从null恢复到gpu的场景）
+                    new Thread(() -> {
+                        try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+                        try {
+                            mpv.command("frame-step");
+                            mpv.command("frame-back-step");
+                        } catch (Throwable ignored) {}
+                    }, "MPV-FrameStep").start();
                 }
             } catch (Throwable ignored) {}
         }
@@ -144,15 +152,15 @@ public class BaseMPVView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private int videoWidth = 16, videoHeight = 9;
+    private Runnable alphaSafetyTimeout;
 
     public void setVideoSize(int w, int h) {
         this.videoWidth = w;
         this.videoHeight = h;
         if (w > 0 && h > 0) {
-            post(() -> {
-                requestLayout();
-                post(() -> setAlpha(1f));
-            });
+            post(() -> requestLayout());
+            // 不在这里恢复alpha，因为FILE_LOADED时新流首帧还没渲染到Surface
+            // 旧帧会露出来，由onFirstFrameRendered负责恢复alpha
         } else {
             post(this::requestLayout);
         }

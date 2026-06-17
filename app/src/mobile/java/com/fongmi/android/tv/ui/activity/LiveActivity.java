@@ -180,6 +180,7 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
         setRecyclerView();
         setVideoView();
         setViewModel();
+        mBinding.progress.getRoot().setBackgroundColor(0x00000000);
     }
 
     @Override
@@ -497,6 +498,7 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     }
 
     private void showProgress() {
+        mBinding.progress.getRoot().setBackgroundColor(0xFF000000);
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         App.post(mR2, 0);
         hideError();
@@ -1126,7 +1128,6 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
             mEnteringPiP = true;
             mPiP.enter(this, player().getVideoWidth(), player().getVideoHeight(), Setting.getLiveScale());
         }
-        if (!isAudioOnly()) setStop(true);
     }
 
     @Override
@@ -1138,7 +1139,7 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
             hideInfo();
             hideUI();
         } else {
-            showOverlay();
+            mBinding.progress.getRoot().setBackgroundColor(0x00000000);
             hideInfo();
             if (isStop()) finish();
         }
@@ -1166,7 +1167,8 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     @Override
     protected void onStop() {
         super.onStop();
-        if (isStop()) player().stop();
+        if (isAudioOnly()) return;
+        setStop(true);
     }
 
     @Override

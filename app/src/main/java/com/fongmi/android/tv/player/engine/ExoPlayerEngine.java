@@ -206,4 +206,8 @@ public class ExoPlayerEngine implements PlayerEngine {
     public float getSpeed() {
         return player.getPlaybackParameters().speed;
     }
+
+    @Override public void setPendingSeekPosition(long positionMs) {
+        // ExoPlayer通过rebuildPlayer+setMediaItem处理，seek在setMediaItem后由PlayerManager处理
+    }
 }
