@@ -1,0 +1,44 @@
+package org.mozilla.javascript.ast;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public class GeneratorExpressionLoop extends ForInLoop {
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public GeneratorExpressionLoop() {
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.mozilla.javascript.ast.ForInLoop
+    public boolean isForEach() {
+        return false;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.mozilla.javascript.ast.ForInLoop
+    public void setIsForEach(boolean z) {
+        throw new UnsupportedOperationException("this node type does not support for each");
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.mozilla.javascript.ast.ForInLoop, org.mozilla.javascript.ast.Scope, org.mozilla.javascript.ast.Jump, org.mozilla.javascript.ast.AstNode
+    public String toSource(int i) {
+        return makeIndent(i) + " for " + (isForEach() ? "each " : "") + "(" + this.iterator.toSource(0) + (isForOf() ? " of " : " in ") + this.iteratedObject.toSource(0) + ")";
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.mozilla.javascript.ast.ForInLoop, org.mozilla.javascript.ast.Scope, org.mozilla.javascript.ast.Jump, org.mozilla.javascript.ast.AstNode
+    public void visit(NodeVisitor nodeVisitor) {
+        if (nodeVisitor.visit(this)) {
+            this.iterator.visit(nodeVisitor);
+            this.iteratedObject.visit(nodeVisitor);
+        }
+    }
+
+    public GeneratorExpressionLoop(int i) {
+        super(i);
+    }
+
+    public GeneratorExpressionLoop(int i, int i2) {
+        super(i, i2);
+    }
+}

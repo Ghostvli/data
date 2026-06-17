@@ -1,0 +1,428 @@
+package okhttp3.internal.concurrent;
+
+import com.hierynomus.msdtyp.FileTime;
+import defpackage.e04;
+import defpackage.fw4;
+import defpackage.gf5;
+import defpackage.we0;
+import defpackage.ww;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import okhttp3.internal._UtilCommonKt;
+import okhttp3.internal._UtilJvmKt;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public final class TaskRunner implements Lockable {
+    public static final Companion Companion = new Companion(null);
+    public static final TaskRunner INSTANCE;
+    private static final Logger logger;
+    private final Backend backend;
+    private final List<TaskQueue> busyQueues;
+    private boolean coordinatorWaiting;
+    private long coordinatorWakeUpAt;
+    private int executeCallCount;
+    private final Logger logger$1;
+    private int nextQueueName;
+    private final List<TaskQueue> readyQueues;
+    private int runCallCount;
+    private final Runnable runnable;
+
+    /* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+    public interface Backend {
+        void coordinatorNotify(TaskRunner taskRunner);
+
+        void coordinatorWait(TaskRunner taskRunner, long j);
+
+        <T> BlockingQueue<T> decorate(BlockingQueue<T> blockingQueue);
+
+        void execute(TaskRunner taskRunner, Runnable runnable);
+
+        long nanoTime();
+    }
+
+    /* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+    public static final class RealBackend implements Backend {
+        private final ThreadPoolExecutor executor;
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        public RealBackend(ThreadFactory threadFactory) {
+            threadFactory.getClass();
+            this.executor = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue(), threadFactory);
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        @Override // okhttp3.internal.concurrent.TaskRunner.Backend
+        public void coordinatorNotify(TaskRunner taskRunner) {
+            taskRunner.getClass();
+            taskRunner.notify();
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        @Override // okhttp3.internal.concurrent.TaskRunner.Backend
+        public void coordinatorWait(TaskRunner taskRunner, long j) throws InterruptedException {
+            taskRunner.getClass();
+            if (_UtilJvmKt.assertionsEnabled && !Thread.holdsLock(taskRunner)) {
+                gf5.a(Thread.currentThread().getName(), " MUST hold lock on ", taskRunner);
+                return;
+            }
+            if (j > 0) {
+                long j2 = j / 1000000;
+                long j3 = j - (1000000 * j2);
+                if (j2 > 0 || j > 0) {
+                    taskRunner.wait(j2, (int) j3);
+                }
+            }
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        @Override // okhttp3.internal.concurrent.TaskRunner.Backend
+        public <T> BlockingQueue<T> decorate(BlockingQueue<T> blockingQueue) {
+            blockingQueue.getClass();
+            return blockingQueue;
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        @Override // okhttp3.internal.concurrent.TaskRunner.Backend
+        public void execute(TaskRunner taskRunner, Runnable runnable) {
+            taskRunner.getClass();
+            runnable.getClass();
+            this.executor.execute(runnable);
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        public final ThreadPoolExecutor getExecutor() {
+            return this.executor;
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        @Override // okhttp3.internal.concurrent.TaskRunner.Backend
+        public long nanoTime() {
+            return System.nanoTime();
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        public final void shutdown() {
+            this.executor.shutdown();
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    /* JADX DEBUG: Multi-variable search result rejected for r1v1, resolved type: java.lang.Object[] */
+    /* JADX DEBUG: Multi-variable search result rejected for r1v2, resolved type: java.lang.Object[] */
+    /* JADX WARN: Multi-variable type inference failed */
+    static {
+        Logger logger2 = Logger.getLogger(TaskRunner.class.getName());
+        logger2.getClass();
+        logger = logger2;
+        INSTANCE = new TaskRunner(new RealBackend(_UtilJvmKt.threadFactory(_UtilJvmKt.okHttpName + " TaskRunner", true)), 0 == true ? 1 : 0, 2, 0 == true ? 1 : 0);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public TaskRunner(Backend backend, Logger logger2) {
+        backend.getClass();
+        logger2.getClass();
+        this.backend = backend;
+        this.logger$1 = logger2;
+        this.nextQueueName = FileTime.NANO100_TO_MILLI;
+        this.busyQueues = new ArrayList();
+        this.readyQueues = new ArrayList();
+        this.runnable = new Runnable() { // from class: okhttp3.internal.concurrent.TaskRunner$runnable$1
+            /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+            /* JADX DEBUG: Finally have unexpected throw blocks count: 3, expect 1 */
+            @Override // java.lang.Runnable
+            public void run() {
+                Task taskAwaitTaskToRun;
+                long jNanoTime;
+                Task taskAwaitTaskToRun2;
+                TaskRunner taskRunner = this.this$0;
+                synchronized (taskRunner) {
+                    taskRunner.runCallCount++;
+                    taskAwaitTaskToRun = taskRunner.awaitTaskToRun();
+                }
+                if (taskAwaitTaskToRun == null) {
+                    return;
+                }
+                Thread threadCurrentThread = Thread.currentThread();
+                String name = threadCurrentThread.getName();
+                while (true) {
+                    try {
+                        threadCurrentThread.setName(taskAwaitTaskToRun.getName());
+                        Logger logger$okhttp = this.this$0.getLogger$okhttp();
+                        TaskQueue queue$okhttp = taskAwaitTaskToRun.getQueue$okhttp();
+                        queue$okhttp.getClass();
+                        boolean zIsLoggable = logger$okhttp.isLoggable(Level.FINE);
+                        if (zIsLoggable) {
+                            jNanoTime = queue$okhttp.getTaskRunner$okhttp().getBackend().nanoTime();
+                            TaskLoggerKt.log(logger$okhttp, taskAwaitTaskToRun, queue$okhttp, "starting");
+                        } else {
+                            jNanoTime = -1;
+                        }
+                        try {
+                            long jRunOnce = taskAwaitTaskToRun.runOnce();
+                            if (zIsLoggable) {
+                                TaskLoggerKt.log(logger$okhttp, taskAwaitTaskToRun, queue$okhttp, "finished run in " + TaskLoggerKt.formatDuration(queue$okhttp.getTaskRunner$okhttp().getBackend().nanoTime() - jNanoTime));
+                            }
+                            TaskRunner taskRunner2 = this.this$0;
+                            synchronized (taskRunner2) {
+                                taskRunner2.afterRun(taskAwaitTaskToRun, jRunOnce, true);
+                                taskAwaitTaskToRun2 = taskRunner2.awaitTaskToRun();
+                            }
+                            if (taskAwaitTaskToRun2 == null) {
+                                return;
+                            } else {
+                                taskAwaitTaskToRun = taskAwaitTaskToRun2;
+                            }
+                        } catch (Throwable th) {
+                            if (zIsLoggable) {
+                                TaskLoggerKt.log(logger$okhttp, taskAwaitTaskToRun, queue$okhttp, "failed a run in " + TaskLoggerKt.formatDuration(queue$okhttp.getTaskRunner$okhttp().getBackend().nanoTime() - jNanoTime));
+                            }
+                            throw th;
+                        }
+                    } catch (Throwable th2) {
+                        try {
+                            TaskRunner taskRunner3 = this.this$0;
+                            synchronized (taskRunner3) {
+                                taskRunner3.afterRun(taskAwaitTaskToRun, -1L, false);
+                                fw4 fw4Var = fw4.a;
+                                if (!(th2 instanceof InterruptedException)) {
+                                    throw th2;
+                                }
+                                Thread.currentThread().interrupt();
+                                return;
+                            }
+                        } finally {
+                            threadCurrentThread.setName(name);
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    /* JADX INFO: Access modifiers changed from: private */
+    public final void afterRun(Task task, long j, boolean z) {
+        if (_UtilJvmKt.assertionsEnabled && !Thread.holdsLock(this)) {
+            gf5.a(Thread.currentThread().getName(), " MUST hold lock on ", this);
+            return;
+        }
+        TaskQueue queue$okhttp = task.getQueue$okhttp();
+        queue$okhttp.getClass();
+        if (queue$okhttp.getActiveTask$okhttp() != task) {
+            e04.a("Check failed.");
+            return;
+        }
+        boolean cancelActiveTask$okhttp = queue$okhttp.getCancelActiveTask$okhttp();
+        queue$okhttp.setCancelActiveTask$okhttp(false);
+        queue$okhttp.setActiveTask$okhttp(null);
+        this.busyQueues.remove(queue$okhttp);
+        if (j != -1 && !cancelActiveTask$okhttp && !queue$okhttp.getShutdown$okhttp()) {
+            queue$okhttp.scheduleAndDecide$okhttp(task, j, true);
+        }
+        if (queue$okhttp.getFutureTasks$okhttp().isEmpty()) {
+            return;
+        }
+        this.readyQueues.add(queue$okhttp);
+        if (z) {
+            return;
+        }
+        startAnotherThread();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private final void beforeRun(Task task) {
+        if (_UtilJvmKt.assertionsEnabled && !Thread.holdsLock(this)) {
+            gf5.a(Thread.currentThread().getName(), " MUST hold lock on ", this);
+            return;
+        }
+        task.setNextExecuteNanoTime$okhttp(-1L);
+        TaskQueue queue$okhttp = task.getQueue$okhttp();
+        queue$okhttp.getClass();
+        queue$okhttp.getFutureTasks$okhttp().remove(task);
+        this.readyQueues.remove(queue$okhttp);
+        queue$okhttp.setActiveTask$okhttp(task);
+        this.busyQueues.add(queue$okhttp);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private final void startAnotherThread() {
+        if (_UtilJvmKt.assertionsEnabled && !Thread.holdsLock(this)) {
+            gf5.a(Thread.currentThread().getName(), " MUST hold lock on ", this);
+            return;
+        }
+        int i = this.executeCallCount;
+        if (i > this.runCallCount) {
+            return;
+        }
+        this.executeCallCount = i + 1;
+        this.backend.execute(this, this.runnable);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public final List<TaskQueue> activeQueues() {
+        List<TaskQueue> listT;
+        synchronized (this) {
+            listT = ww.T(this.busyQueues, this.readyQueues);
+        }
+        return listT;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public final Task awaitTaskToRun() {
+        boolean z;
+        if (_UtilJvmKt.assertionsEnabled && !Thread.holdsLock(this)) {
+            gf5.a(Thread.currentThread().getName(), " MUST hold lock on ", this);
+            return null;
+        }
+        while (!this.readyQueues.isEmpty()) {
+            long jNanoTime = this.backend.nanoTime();
+            Iterator<TaskQueue> it = this.readyQueues.iterator();
+            long jMin = Long.MAX_VALUE;
+            Task task = null;
+            while (true) {
+                if (!it.hasNext()) {
+                    z = false;
+                    break;
+                }
+                Task task2 = it.next().getFutureTasks$okhttp().get(0);
+                long jMax = Math.max(0L, task2.getNextExecuteNanoTime$okhttp() - jNanoTime);
+                if (jMax > 0) {
+                    jMin = Math.min(jMax, jMin);
+                } else {
+                    if (task != null) {
+                        z = true;
+                        break;
+                    }
+                    task = task2;
+                }
+            }
+            if (task != null) {
+                beforeRun(task);
+                if (z || (!this.coordinatorWaiting && !this.readyQueues.isEmpty())) {
+                    startAnotherThread();
+                }
+                return task;
+            }
+            if (this.coordinatorWaiting) {
+                if (jMin < this.coordinatorWakeUpAt - jNanoTime) {
+                    this.backend.coordinatorNotify(this);
+                }
+                return null;
+            }
+            this.coordinatorWaiting = true;
+            this.coordinatorWakeUpAt = jNanoTime + jMin;
+            try {
+                try {
+                    this.backend.coordinatorWait(this, jMin);
+                } catch (InterruptedException unused) {
+                    cancelAll();
+                }
+            } finally {
+                this.coordinatorWaiting = false;
+            }
+        }
+        return null;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    /* JADX DEBUG: Move duplicate insns, count: 1 to block B:10:0x0021 */
+    public final void cancelAll() {
+        if (_UtilJvmKt.assertionsEnabled && !Thread.holdsLock(this)) {
+            gf5.a(Thread.currentThread().getName(), " MUST hold lock on ", this);
+            return;
+        }
+        int size = this.busyQueues.size();
+        while (true) {
+            size--;
+            if (-1 >= size) {
+                break;
+            } else {
+                this.busyQueues.get(size).cancelAllAndDecide$okhttp();
+            }
+        }
+        for (int size2 = this.readyQueues.size() - 1; -1 < size2; size2--) {
+            TaskQueue taskQueue = this.readyQueues.get(size2);
+            taskQueue.cancelAllAndDecide$okhttp();
+            if (taskQueue.getFutureTasks$okhttp().isEmpty()) {
+                this.readyQueues.remove(size2);
+            }
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public final Backend getBackend() {
+        return this.backend;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public final Logger getLogger$okhttp() {
+        return this.logger$1;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public final void kickCoordinator$okhttp(TaskQueue taskQueue) {
+        taskQueue.getClass();
+        if (_UtilJvmKt.assertionsEnabled && !Thread.holdsLock(this)) {
+            gf5.a(Thread.currentThread().getName(), " MUST hold lock on ", this);
+            return;
+        }
+        if (taskQueue.getActiveTask$okhttp() == null) {
+            boolean zIsEmpty = taskQueue.getFutureTasks$okhttp().isEmpty();
+            List<TaskQueue> list = this.readyQueues;
+            if (zIsEmpty) {
+                list.remove(taskQueue);
+            } else {
+                _UtilCommonKt.addIfAbsent(list, taskQueue);
+            }
+        }
+        if (this.coordinatorWaiting) {
+            this.backend.coordinatorNotify(this);
+        } else {
+            startAnotherThread();
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public final TaskQueue newQueue() {
+        int i;
+        synchronized (this) {
+            i = this.nextQueueName;
+            this.nextQueueName = i + 1;
+        }
+        return new TaskQueue(this, "Q" + i);
+    }
+
+    /* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+    public static final class Companion {
+        /* JADX DEBUG: Can't inline method, not implemented redirect type for insn: 0x0000: CONSTRUCTOR  A[MD:():void (m)] (LINE:1) call: okhttp3.internal.concurrent.TaskRunner.Companion.<init>():void type: THIS */
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        public /* synthetic */ Companion(we0 we0Var) {
+            this();
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        public final Logger getLogger() {
+            return TaskRunner.logger;
+        }
+
+        private Companion() {
+        }
+    }
+
+    /* JADX DEBUG: Can't inline method, not implemented redirect type for insn: 0x0006: CONSTRUCTOR 
+      (r1v0 okhttp3.internal.concurrent.TaskRunner$Backend)
+      (wrap:java.util.logging.Logger:?: TERNARY null = ((wrap:int:0x0000: ARITH (r3v0 int) & (2 int) A[WRAPPED]) != (0 int)) ? (wrap:java.util.logging.Logger:0x0004: SGET  A[WRAPPED] (LINE:40) okhttp3.internal.concurrent.TaskRunner.logger java.util.logging.Logger) : (r2v0 java.util.logging.Logger))
+     A[MD:(okhttp3.internal.concurrent.TaskRunner$Backend, java.util.logging.Logger):void (m)] (LINE:41) call: okhttp3.internal.concurrent.TaskRunner.<init>(okhttp3.internal.concurrent.TaskRunner$Backend, java.util.logging.Logger):void type: THIS */
+    public /* synthetic */ TaskRunner(Backend backend, Logger logger2, int i, we0 we0Var) {
+        this(backend, (i & 2) != 0 ? logger : logger2);
+    }
+}

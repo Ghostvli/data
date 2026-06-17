@@ -1,0 +1,39 @@
+package org.jupnp.support.avtransport.impl.state;
+
+import defpackage.j02;
+import defpackage.n02;
+import java.net.URI;
+import org.jupnp.support.avtransport.lastchange.AVTransportVariable;
+import org.jupnp.support.model.AVTransport;
+import org.jupnp.support.model.TransportAction;
+import org.jupnp.support.model.TransportInfo;
+import org.jupnp.support.model.TransportState;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public abstract class NoMediaPresent<T extends AVTransport> extends AbstractState<T> {
+    private final j02 logger;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public NoMediaPresent(T t) {
+        super(t);
+        this.logger = n02.k(NoMediaPresent.class);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.impl.state.AbstractState
+    public TransportAction[] getCurrentTransportActions() {
+        return new TransportAction[]{TransportAction.Stop};
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public void onEntry() {
+        this.logger.b("Setting transport state to NO_MEDIA_PRESENT");
+        T transport = getTransport();
+        TransportState transportState = TransportState.NO_MEDIA_PRESENT;
+        transport.setTransportInfo(new TransportInfo(transportState, getTransport().getTransportInfo().getCurrentTransportStatus(), getTransport().getTransportInfo().getCurrentSpeed()));
+        getTransport().getLastChange().setEventedValue(getTransport().getInstanceId(), new AVTransportVariable.TransportState(transportState), new AVTransportVariable.CurrentTransportActions(getCurrentTransportActions()));
+    }
+
+    public abstract Class<? extends AbstractState<?>> setTransportURI(URI uri, String str);
+}

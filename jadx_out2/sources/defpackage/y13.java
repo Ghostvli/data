@@ -1,0 +1,81 @@
+package defpackage;
+
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.util.Log;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public abstract class y13 {
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Intent a(Activity activity) {
+        Intent parentActivityIntent = activity.getParentActivityIntent();
+        if (parentActivityIntent != null) {
+            return parentActivityIntent;
+        }
+        String strC = c(activity);
+        if (strC == null) {
+            return null;
+        }
+        ComponentName componentName = new ComponentName(activity, strC);
+        try {
+            return d(activity, componentName) == null ? Intent.makeMainActivity(componentName) : new Intent().setComponent(componentName);
+        } catch (PackageManager.NameNotFoundException unused) {
+            Log.e("NavUtils", "getParentActivityIntent: bad parentActivityName '" + strC + "' in manifest");
+            return null;
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Intent b(Context context, ComponentName componentName) throws PackageManager.NameNotFoundException {
+        String strD = d(context, componentName);
+        if (strD == null) {
+            return null;
+        }
+        ComponentName componentName2 = new ComponentName(componentName.getPackageName(), strD);
+        return d(context, componentName2) == null ? Intent.makeMainActivity(componentName2) : new Intent().setComponent(componentName2);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static String c(Activity activity) {
+        try {
+            return d(activity, activity.getComponentName());
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static String d(Context context, ComponentName componentName) throws PackageManager.NameNotFoundException {
+        String string;
+        ActivityInfo activityInfo = context.getPackageManager().getActivityInfo(componentName, Build.VERSION.SDK_INT >= 29 ? 269222528 : 787072);
+        String str = activityInfo.parentActivityName;
+        if (str != null) {
+            return str;
+        }
+        Bundle bundle = activityInfo.metaData;
+        if (bundle == null || (string = bundle.getString("android.support.PARENT_ACTIVITY")) == null) {
+            return null;
+        }
+        if (string.charAt(0) != '.') {
+            return string;
+        }
+        return context.getPackageName() + string;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static void e(Activity activity, Intent intent) {
+        activity.navigateUpTo(intent);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static boolean f(Activity activity, Intent intent) {
+        return activity.shouldUpRecreateTask(intent);
+    }
+}

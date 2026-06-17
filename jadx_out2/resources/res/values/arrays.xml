@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="assume_strong_biometrics_models">
+        <item>Pixel 4</item>
+        <item>Pixel 4 XL</item>
+    </array>
+    <array name="cast_mode">
+        <item>@drawable/ic_sync_two</item>
+        <item>@drawable/ic_sync_upload</item>
+        <item>@drawable/ic_sync_download</item>
+    </array>
+    <array name="crypto_fingerprint_fallback_prefixes">
+    </array>
+    <array name="crypto_fingerprint_fallback_vendors">
+        <item>samsung</item>
+    </array>
+    <array name="delay_showing_prompt_models">
+        <item>Pixel 4</item>
+        <item>Pixel 4 XL</item>
+    </array>
+    <array name="doh_name">
+        <item>System</item>
+        <item>Tencent</item>
+        <item>Alibaba</item>
+        <item>360</item>
+    </array>
+    <array name="doh_url">
+        <item />
+        <item>https://doh.pub/dns-query</item>
+        <item>https://dns.alidns.com/dns-query</item>
+        <item>https://doh.360.cn/dns-query</item>
+    </array>
+    <array name="exo_controls_playback_speeds">
+        <item>0.25x</item>
+        <item>0.5x</item>
+        <item>0.75x</item>
+        <item>Normal</item>
+        <item>1.25x</item>
+        <item>1.5x</item>
+        <item>2x</item>
+    </array>
+    <array name="hide_fingerprint_instantly_prefixes">
+        <item>SM-A50</item>
+        <item>SM-G973</item>
+        <item>SM-G975</item>
+        <item>SM-G977</item>
+        <item>SM-G770</item>
+        <item>SM-N970</item>
+        <item>SM-N971</item>
+        <item>SM-N975</item>
+        <item>SM-N976</item>
+        <item>SM-N770</item>
+        <item>SC-03L</item>
+        <item>SC-04L</item>
+        <item>SC-05L</item>
+        <item>SC-01M</item>
+        <item>SCV41</item>
+        <item>SCV42</item>
+        <item>SCV45</item>
+    </array>
+    <array name="select_background">
+        <item>Off</item>
+        <item>On</item>
+        <item>PiP</item>
+    </array>
+    <array name="select_caption">
+        <item>Default</item>
+        <item>System</item>
+    </array>
+    <array name="select_decode">
+        <item>软解</item>
+        <item>硬解</item>
+    </array>
+    <array name="select_play_end">
+        <item>原地不动</item>
+        <item>自动下一集</item>
+        <item>退出播放器</item>
+    </array>
+    <array name="select_player_engine">
+        <item>EXO</item>
+        <item>MPV</item>
+    </array>
+    <array name="select_render">
+        <item>Surface</item>
+        <item>Texture</item>
+    </array>
+    <array name="select_reset">
+        <item>Reset</item>
+        <item>Replay</item>
+    </array>
+    <array name="select_rtsp_transport">
+        <item>TCP</item>
+        <item>UDP</item>
+    </array>
+    <array name="select_scale">
+        <item>Default</item>
+        <item>16:9</item>
+        <item>4:3</item>
+        <item>Fill</item>
+        <item>Zoom</item>
+    </array>
+    <array name="select_size">
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Large</item>
+        <item>Extra</item>
+    </array>
+    <array name="select_track">
+        <item>Select audio track</item>
+        <item>Select video track</item>
+        <item>Select subtitle track</item>
+    </array>
+</resources>

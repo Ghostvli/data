@@ -1,0 +1,52 @@
+package org.jupnp.support.avtransport;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public enum AVTransportErrorCode {
+    TRANSITION_NOT_AVAILABLE(701, "The immediate transition from current to desired state not supported"),
+    NO_CONTENTS(702, "The media does not contain any contents that can be played"),
+    READ_ERROR(703, "The media cannot be read"),
+    PLAYBACK_FORMAT_NOT_SUPPORTED(704, "The storage format of the currently loaded media is not supported for playback"),
+    TRANSPORT_LOCKED(705, "The transport is 'hold locked', e.g. with a keyboard lock"),
+    WRITE_ERROR(706, "The media cannot be written"),
+    MEDIA_PROTECTED(707, "The media is write-protected or is of a not writable type"),
+    RECORD_FORMAT_NOT_SUPPORTED(708, "The storage format of the currently loaded media is not supported for recording"),
+    MEDIA_FULL(709, "There is no free space left on the loaded media"),
+    SEEKMODE_NOT_SUPPORTED(710, "The specified seek mode is not supported by the device"),
+    ILLEGAL_SEEK_TARGET(711, "The specified seek target is not specified in terms of the seek mode, or is not present on the media"),
+    PLAYMODE_NOT_SUPPORTED(712, "The specified play mode is not supported by the device"),
+    RECORDQUALITYMODE_NOT_SUPPORTED(713, "The specified record quality mode is not supported by the device"),
+    ILLEGAL_MIME_TYPE(714, "The specified resource has a MIME-type which is not supported"),
+    CONTENT_BUSY(715, "The resource is already being played by other means"),
+    RESOURCE_NOT_FOUND(716, "The specified resource cannot be found in the network"),
+    INVALID_INSTANCE_ID(718, "The specified instanceID is invalid for this AVTransport");
+
+    private final int code;
+    private final String description;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    AVTransportErrorCode(int i, String str) {
+        this.code = i;
+        this.description = str;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static AVTransportErrorCode getByCode(int i) {
+        for (AVTransportErrorCode aVTransportErrorCode : values()) {
+            if (aVTransportErrorCode.getCode() == i) {
+                return aVTransportErrorCode;
+            }
+        }
+        return null;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public int getCode() {
+        return this.code;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public String getDescription() {
+        return this.description;
+    }
+}

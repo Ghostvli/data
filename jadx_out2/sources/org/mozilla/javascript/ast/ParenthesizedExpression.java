@@ -1,0 +1,58 @@
+package org.mozilla.javascript.ast;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public class ParenthesizedExpression extends AstNode {
+    private AstNode expression;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public ParenthesizedExpression(AstNode astNode) {
+        this(astNode != null ? astNode.getPosition() : 0, astNode != null ? astNode.getLength() : 1, astNode);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public AstNode getExpression() {
+        return this.expression;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public void setExpression(AstNode astNode) {
+        assertNotNull(astNode);
+        this.expression = astNode;
+        astNode.setParent(this);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.mozilla.javascript.ast.AstNode
+    public String toSource(int i) {
+        return makeIndent(i) + "(" + this.expression.toSource(0) + ")";
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.mozilla.javascript.ast.AstNode
+    public void visit(NodeVisitor nodeVisitor) {
+        if (nodeVisitor.visit(this)) {
+            this.expression.visit(nodeVisitor);
+        }
+    }
+
+    public ParenthesizedExpression(int i) {
+        super(i);
+        this.type = 96;
+    }
+
+    public ParenthesizedExpression(int i, int i2) {
+        super(i, i2);
+        this.type = 96;
+    }
+
+    public ParenthesizedExpression() {
+        this.type = 96;
+    }
+
+    public ParenthesizedExpression(int i, int i2, AstNode astNode) {
+        super(i, i2);
+        this.type = 96;
+        setExpression(astNode);
+    }
+}

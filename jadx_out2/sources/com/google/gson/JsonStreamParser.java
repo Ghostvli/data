@@ -1,0 +1,74 @@
+package com.google.gson;
+
+import com.google.gson.internal.Streams;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.MalformedJsonException;
+import defpackage.bo;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Iterator;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public final class JsonStreamParser implements Iterator<JsonElement> {
+    private final Object lock;
+    private final JsonReader parser;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public JsonStreamParser(Reader reader) {
+        JsonReader jsonReader = new JsonReader(reader);
+        this.parser = jsonReader;
+        jsonReader.setStrictness(Strictness.LENIENT);
+        this.lock = new Object();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // java.util.Iterator
+    public boolean hasNext() {
+        boolean z;
+        synchronized (this.lock) {
+            try {
+                try {
+                    try {
+                        z = this.parser.peek() != JsonToken.END_DOCUMENT;
+                    } catch (IOException e) {
+                        throw new JsonIOException(e);
+                    }
+                } catch (MalformedJsonException e2) {
+                    throw new JsonSyntaxException(e2);
+                }
+            } catch (Throwable th) {
+                throw th;
+            }
+        }
+        return z;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    /* JADX DEBUG: Method merged with bridge method: next()Ljava/lang/Object; */
+    /* JADX WARN: Can't rename method to resolve collision */
+    @Override // java.util.Iterator
+    public JsonElement next() {
+        if (!hasNext()) {
+            bo.a();
+            return null;
+        }
+        try {
+            return Streams.parse(this.parser);
+        } catch (OutOfMemoryError | StackOverflowError e) {
+            throw new JsonParseException("Failed parsing JSON source to Json", e);
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // java.util.Iterator
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
+
+    public JsonStreamParser(String str) {
+        this(new StringReader(str));
+    }
+}

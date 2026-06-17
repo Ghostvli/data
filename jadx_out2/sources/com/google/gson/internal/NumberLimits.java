@@ -1,0 +1,38 @@
+package com.google.gson.internal;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public class NumberLimits {
+    private static final int MAX_NUMBER_STRING_LENGTH = 10000;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private NumberLimits() {
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private static void checkNumberStringLength(String str) {
+        if (str.length() <= 10000) {
+            return;
+        }
+        throw new NumberFormatException("Number string too large: " + str.substring(0, 30) + "...");
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static BigDecimal parseBigDecimal(String str) {
+        checkNumberStringLength(str);
+        BigDecimal bigDecimal = new BigDecimal(str);
+        if (Math.abs(bigDecimal.scale()) < 10000) {
+            return bigDecimal;
+        }
+        throw new NumberFormatException("Number has unsupported scale: " + str);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static BigInteger parseBigInteger(String str) {
+        checkNumberStringLength(str);
+        return new BigInteger(str);
+    }
+}

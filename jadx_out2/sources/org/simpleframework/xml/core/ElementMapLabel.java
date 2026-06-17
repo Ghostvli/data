@@ -1,0 +1,181 @@
+package org.simpleframework.xml.core;
+
+import java.lang.annotation.Annotation;
+import org.simpleframework.xml.ElementMap;
+import org.simpleframework.xml.strategy.Type;
+import org.simpleframework.xml.stream.Format;
+import org.simpleframework.xml.stream.Style;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+class ElementMapLabel extends TemplateLabel {
+    private Expression cache;
+    private boolean data;
+    private Decorator decorator;
+    private Introspector detail;
+    private Entry entry;
+    private Format format;
+    private boolean inline;
+    private Class[] items;
+    private ElementMap label;
+    private String name;
+    private String override;
+    private String parent;
+    private String path;
+    private boolean required;
+    private Class type;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public ElementMapLabel(Contact contact, ElementMap elementMap, Format format) {
+        this.detail = new Introspector(contact, this, format);
+        this.decorator = new Qualifier(contact);
+        this.entry = new Entry(contact, elementMap);
+        this.required = elementMap.required();
+        this.type = contact.getType();
+        this.inline = elementMap.inline();
+        this.override = elementMap.name();
+        this.data = elementMap.data();
+        this.format = format;
+        this.label = elementMap;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private Type getMap() {
+        return new ClassType(this.type);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Label
+    public Annotation getAnnotation() {
+        return this.label;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Label
+    public Contact getContact() {
+        return this.detail.getContact();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Label
+    public Converter getConverter(Context context) {
+        Type map = getMap();
+        boolean zInline = this.label.inline();
+        Entry entry = this.entry;
+        return !zInline ? new CompositeMap(context, entry, map) : new CompositeInlineMap(context, entry, map);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Label
+    public Decorator getDecorator() {
+        return this.decorator;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.TemplateLabel, org.simpleframework.xml.core.Label
+    public Type getDependent() throws ElementException {
+        Contact contact = getContact();
+        if (this.items == null) {
+            this.items = contact.getDependents();
+        }
+        Class[] clsArr = this.items;
+        if (clsArr != null) {
+            return clsArr.length == 0 ? new ClassType(Object.class) : new ClassType(clsArr[0]);
+        }
+        throw new ElementException("Unable to determine type for %s", contact);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Label
+    public Object getEmpty(Context context) {
+        MapFactory mapFactory = new MapFactory(context, new ClassType(this.type));
+        if (this.label.empty()) {
+            return null;
+        }
+        return mapFactory.getInstance();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.TemplateLabel, org.simpleframework.xml.core.Label
+    public String getEntry() {
+        Style style = this.format.getStyle();
+        if (this.detail.isEmpty(this.parent)) {
+            this.parent = this.detail.getEntry();
+        }
+        return style.getElement(this.parent);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Label
+    public Expression getExpression() {
+        if (this.cache == null) {
+            this.cache = this.detail.getExpression();
+        }
+        return this.cache;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Label
+    public String getName() {
+        if (this.name == null) {
+            Style style = this.format.getStyle();
+            String entry = this.entry.getEntry();
+            if (!this.label.inline()) {
+                entry = this.detail.getName();
+            }
+            this.name = style.getElement(entry);
+        }
+        return this.name;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Label
+    public String getOverride() {
+        return this.override;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Label
+    public String getPath() {
+        if (this.path == null) {
+            this.path = getExpression().getElement(getName());
+        }
+        return this.path;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Label
+    public Class getType() {
+        return this.type;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.TemplateLabel, org.simpleframework.xml.core.Label
+    public boolean isCollection() {
+        return true;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Label
+    public boolean isData() {
+        return this.data;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.TemplateLabel, org.simpleframework.xml.core.Label
+    public boolean isInline() {
+        return this.inline;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Label
+    public boolean isRequired() {
+        return this.required;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Label
+    public String toString() {
+        return this.detail.toString();
+    }
+}

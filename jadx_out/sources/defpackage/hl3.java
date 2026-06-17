@@ -1,0 +1,50 @@
+package defpackage;
+
+/* JADX INFO: loaded from: classes.dex */
+public abstract class hl3 {
+    public static int A = 2131230818;
+    public static int B = 2131230819;
+    public static int C = 2131230820;
+    public static int D = 2131230821;
+    public static int E = 2131230822;
+    public static int F = 2131230823;
+    public static int G = 2131230824;
+    public static int H = 2131230825;
+    public static int I = 2131230826;
+    public static int J = 2131230827;
+    public static int K = 2131230829;
+    public static int L = 2131230830;
+    public static int M = 2131230831;
+    public static int N = 2131230832;
+    public static int O = 2131230833;
+    public static int P = 2131230834;
+    public static int Q = 2131230835;
+    public static int R = 2131230836;
+    public static int S = 2131230837;
+    public static int a = 2131230760;
+    public static int b = 2131230762;
+    public static int c = 2131230763;
+    public static int d = 2131230764;
+    public static int e = 2131230767;
+    public static int f = 2131230768;
+    public static int g = 2131230769;
+    public static int h = 2131230770;
+    public static int i = 2131230775;
+    public static int j = 2131230776;
+    public static int k = 2131230777;
+    public static int l = 2131230779;
+    public static int m = 2131230780;
+    public static int n = 2131230781;
+    public static int o = 2131230784;
+    public static int p = 2131230786;
+    public static int q = 2131230787;
+    public static int r = 2131230789;
+    public static int s = 2131230790;
+    public static int t = 2131230791;
+    public static int u = 2131230797;
+    public static int v = 2131230808;
+    public static int w = 2131230809;
+    public static int x = 2131230810;
+    public static int y = 2131230811;
+    public static int z = 2131230812;
+}

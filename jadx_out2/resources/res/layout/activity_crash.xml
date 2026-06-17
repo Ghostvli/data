@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:fitsSystemWindows="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/customactivityoncrash_error_image"
+        android:contentDescription="@null"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:textSize="16sp"
+        android:textColor="@color/grey_200"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/crash_info"
+        android:lineSpacingExtra="4dp"/>
+    <com.google.android.material.button.MaterialButton
+        android:textColor="@color/white"
+        android:id="@+id/restart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/crash_restart"
+        android:backgroundTint="?android:attr/colorControlActivated"/>
+    <com.google.android.material.button.MaterialButton
+        android:textColor="@color/grey_200"
+        android:id="@+id/details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/crash_details"
+        style="?attr/borderlessButtonStyle"/>
+</androidx.appcompat.widget.LinearLayoutCompat>

@@ -1,0 +1,208 @@
+package org.jupnp.support.model;
+
+import java.util.Map;
+import org.jupnp.model.ModelUtil;
+import org.jupnp.model.action.ActionArgumentValue;
+import org.jupnp.model.types.UnsignedIntegerFourBytes;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public class PositionInfo {
+    private int absCount;
+    private String absTime;
+    private int relCount;
+    private String relTime;
+    private UnsignedIntegerFourBytes track;
+    private String trackDuration;
+    private String trackMetaData;
+    private String trackURI;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public PositionInfo(Map<String, ActionArgumentValue<?>> map) {
+        this(((UnsignedIntegerFourBytes) map.get("Track").getValue()).getValue().longValue(), (String) map.get("TrackDuration").getValue(), (String) map.get("TrackMetaData").getValue(), (String) map.get("TrackURI").getValue(), (String) map.get("RelTime").getValue(), (String) map.get("AbsTime").getValue(), ((Integer) map.get("RelCount").getValue()).intValue(), ((Integer) map.get("AbsCount").getValue()).intValue());
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public int getAbsCount() {
+        return this.absCount;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public String getAbsTime() {
+        return this.absTime;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public int getElapsedPercent() {
+        long trackElapsedSeconds = getTrackElapsedSeconds();
+        long trackDurationSeconds = getTrackDurationSeconds();
+        if (trackElapsedSeconds == 0 || trackDurationSeconds == 0) {
+            return 0;
+        }
+        return Double.valueOf(trackElapsedSeconds / (trackDurationSeconds / 100.0d)).intValue();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public int getRelCount() {
+        return this.relCount;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public String getRelTime() {
+        return this.relTime;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public UnsignedIntegerFourBytes getTrack() {
+        return this.track;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public String getTrackDuration() {
+        return this.trackDuration;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public long getTrackDurationSeconds() {
+        if (getTrackDuration() == null) {
+            return 0L;
+        }
+        return ModelUtil.fromTimeString(getTrackDuration());
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public long getTrackElapsedSeconds() {
+        if (getRelTime() == null || getRelTime().equals("NOT_IMPLEMENTED")) {
+            return 0L;
+        }
+        return ModelUtil.fromTimeString(getRelTime());
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public String getTrackMetaData() {
+        return this.trackMetaData;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public long getTrackRemainingSeconds() {
+        return getTrackDurationSeconds() - getTrackElapsedSeconds();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public String getTrackURI() {
+        return this.trackURI;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public void setRelTime(String str) {
+        this.relTime = str;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public void setTrackDuration(String str) {
+        this.trackDuration = str;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public String toString() {
+        return "(PositionInfo) Track: " + String.valueOf(getTrack()) + " RelTime: " + getRelTime() + " Duration: " + getTrackDuration() + " Percent: " + getElapsedPercent();
+    }
+
+    public PositionInfo() {
+        this.track = new UnsignedIntegerFourBytes(0L);
+        this.trackDuration = "00:00:00";
+        this.trackMetaData = "NOT_IMPLEMENTED";
+        this.trackURI = "";
+        this.relTime = "00:00:00";
+        this.absTime = "00:00:00";
+        this.relCount = Integer.MAX_VALUE;
+        this.absCount = Integer.MAX_VALUE;
+    }
+
+    public PositionInfo(PositionInfo positionInfo, String str, String str2) {
+        this.track = new UnsignedIntegerFourBytes(0L);
+        this.trackDuration = "00:00:00";
+        this.trackMetaData = "NOT_IMPLEMENTED";
+        this.trackURI = "";
+        this.relTime = "00:00:00";
+        this.absTime = "00:00:00";
+        this.relCount = Integer.MAX_VALUE;
+        this.absCount = Integer.MAX_VALUE;
+        this.track = positionInfo.track;
+        this.trackDuration = positionInfo.trackDuration;
+        this.trackMetaData = positionInfo.trackMetaData;
+        this.trackURI = positionInfo.trackURI;
+        this.relTime = str;
+        this.absTime = str2;
+        this.relCount = positionInfo.relCount;
+        this.absCount = positionInfo.absCount;
+    }
+
+    public PositionInfo(PositionInfo positionInfo, long j, long j2) {
+        this.track = new UnsignedIntegerFourBytes(0L);
+        this.trackDuration = "00:00:00";
+        this.trackMetaData = "NOT_IMPLEMENTED";
+        this.trackURI = "";
+        this.relTime = "00:00:00";
+        this.absTime = "00:00:00";
+        this.relCount = Integer.MAX_VALUE;
+        this.absCount = Integer.MAX_VALUE;
+        this.track = positionInfo.track;
+        this.trackDuration = positionInfo.trackDuration;
+        this.trackMetaData = positionInfo.trackMetaData;
+        this.trackURI = positionInfo.trackURI;
+        this.relTime = ModelUtil.toTimeString(j);
+        this.absTime = ModelUtil.toTimeString(j2);
+        this.relCount = positionInfo.relCount;
+        this.absCount = positionInfo.absCount;
+    }
+
+    public PositionInfo(long j, String str, String str2, String str3, String str4) {
+        this.track = new UnsignedIntegerFourBytes(0L);
+        this.trackDuration = "00:00:00";
+        this.trackMetaData = "NOT_IMPLEMENTED";
+        this.trackURI = "";
+        this.relTime = "00:00:00";
+        this.absTime = "00:00:00";
+        this.relCount = Integer.MAX_VALUE;
+        this.absCount = Integer.MAX_VALUE;
+        this.track = new UnsignedIntegerFourBytes(j);
+        this.trackDuration = str;
+        this.trackURI = str2;
+        this.relTime = str3;
+        this.absTime = str4;
+    }
+
+    public PositionInfo(long j, String str, String str2, String str3, String str4, String str5, int i, int i2) {
+        this.track = new UnsignedIntegerFourBytes(0L);
+        this.trackDuration = "00:00:00";
+        this.trackMetaData = "NOT_IMPLEMENTED";
+        this.trackURI = "";
+        this.relTime = "00:00:00";
+        this.absTime = "00:00:00";
+        this.relCount = Integer.MAX_VALUE;
+        this.absCount = Integer.MAX_VALUE;
+        this.track = new UnsignedIntegerFourBytes(j);
+        this.trackDuration = str;
+        this.trackMetaData = str2;
+        this.trackURI = str3;
+        this.relTime = str4;
+        this.absTime = str5;
+        this.relCount = i;
+        this.absCount = i2;
+    }
+
+    public PositionInfo(long j, String str, String str2) {
+        this.track = new UnsignedIntegerFourBytes(0L);
+        this.trackDuration = "00:00:00";
+        this.trackMetaData = "NOT_IMPLEMENTED";
+        this.trackURI = "";
+        this.relTime = "00:00:00";
+        this.absTime = "00:00:00";
+        this.relCount = Integer.MAX_VALUE;
+        this.absCount = Integer.MAX_VALUE;
+        this.track = new UnsignedIntegerFourBytes(j);
+        this.trackMetaData = str;
+        this.trackURI = str2;
+    }
+}

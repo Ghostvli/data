@@ -1,0 +1,9 @@
+package kotlin.jvm.functions;
+
+import defpackage.q81;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public interface Function10<P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, R> extends q81 {
+    R invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8, P9 p9, P10 p10);
+}

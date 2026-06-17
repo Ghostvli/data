@@ -1,0 +1,269 @@
+package org.mozilla.javascript.optimizer;
+
+import defpackage.d04;
+import org.mozilla.javascript.ArrowFunction;
+import org.mozilla.javascript.Callable;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextAction;
+import org.mozilla.javascript.ContextFactory;
+import org.mozilla.javascript.ES6Generator;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.JavaScriptException;
+import org.mozilla.javascript.NativeFunction;
+import org.mozilla.javascript.NativeGenerator;
+import org.mozilla.javascript.NativeIterator;
+import org.mozilla.javascript.Script;
+import org.mozilla.javascript.ScriptRuntime;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Undefined;
+import org.mozilla.javascript.optimizer.OptRuntime;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public final class OptRuntime extends ScriptRuntime {
+    public static final Integer oneObj = 1;
+    public static final Integer minusOneObj = -1;
+
+    /* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+    public static class GeneratorState {
+        static final String CLASS_NAME = "org/mozilla/javascript/optimizer/OptRuntime$GeneratorState";
+        static final String resumptionPoint_NAME = "resumptionPoint";
+        static final String resumptionPoint_TYPE = "I";
+        static final String thisObj_NAME = "thisObj";
+        static final String thisObj_TYPE = "Lorg/mozilla/javascript/Scriptable;";
+        Object[] localsState;
+        int maxLocals;
+        int maxStack;
+        public int resumptionPoint;
+        Object returnValue;
+        Object[] stackState;
+        public Scriptable thisObj;
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        public GeneratorState(Scriptable scriptable, int i, int i2) {
+            this.thisObj = scriptable;
+            this.maxLocals = i;
+            this.maxStack = i2;
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object add(Object obj, double d, Context context) {
+        return obj instanceof Double ? Double.valueOf(((Double) obj).doubleValue() + d) : obj instanceof Integer ? Double.valueOf(((double) ((Integer) obj).intValue()) + d) : ScriptRuntime.add(obj, Double.valueOf(d), context);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static /* synthetic */ Object b(String[] strArr, Script script, Context context) {
+        ScriptableObject global = ScriptRuntime.getGlobal(context);
+        Object[] objArr = new Object[strArr.length];
+        System.arraycopy(strArr, 0, objArr, 0, strArr.length);
+        global.defineProperty("arguments", context.newArray(global, objArr), 2);
+        script.exec(context, global);
+        return null;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Function bindThis(NativeFunction nativeFunction, Context context, Scriptable scriptable, Scriptable scriptable2) {
+        return new ArrowFunction(context, scriptable, nativeFunction, scriptable2, null);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object call0(Callable callable, Scriptable scriptable, Context context, Scriptable scriptable2) {
+        return callable.call(context, scriptable2, scriptable, ScriptRuntime.emptyArgs);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object call0Optional(Callable callable, Scriptable scriptable, Context context, Scriptable scriptable2) {
+        return callable == null ? Undefined.instance : call0(callable, scriptable, context, scriptable2);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object call1(Callable callable, Scriptable scriptable, Object obj, Context context, Scriptable scriptable2) {
+        return callable.call(context, scriptable2, scriptable, new Object[]{obj});
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object call2(Callable callable, Scriptable scriptable, Object obj, Object obj2, Context context, Scriptable scriptable2) {
+        return callable.call(context, scriptable2, scriptable, new Object[]{obj, obj2});
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object callN(Callable callable, Scriptable scriptable, Object[] objArr, Context context, Scriptable scriptable2) {
+        return callable.call(context, scriptable2, scriptable, objArr);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object callName(Object[] objArr, String str, Context context, Scriptable scriptable) {
+        return ScriptRuntime.getNameFunctionAndThis(str, context, scriptable).call(context, scriptable, ScriptRuntime.lastStoredScriptable(context), objArr);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object callName0(String str, Context context, Scriptable scriptable) {
+        return ScriptRuntime.getNameFunctionAndThis(str, context, scriptable).call(context, scriptable, ScriptRuntime.lastStoredScriptable(context), ScriptRuntime.emptyArgs);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object callName0Optional(String str, Context context, Scriptable scriptable) {
+        Callable nameFunctionAndThisOptional = ScriptRuntime.getNameFunctionAndThisOptional(str, context, scriptable);
+        return nameFunctionAndThisOptional == null ? Undefined.instance : nameFunctionAndThisOptional.call(context, scriptable, ScriptRuntime.lastStoredScriptable(context), ScriptRuntime.emptyArgs);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object callProp0(Object obj, String str, Context context, Scriptable scriptable) {
+        return ScriptRuntime.getPropFunctionAndThis(obj, str, context, scriptable).call(context, scriptable, ScriptRuntime.lastStoredScriptable(context), ScriptRuntime.emptyArgs);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object callProp0Optional(Object obj, String str, Context context, Scriptable scriptable) {
+        Callable propFunctionAndThisOptional = ScriptRuntime.getPropFunctionAndThisOptional(obj, str, context, scriptable);
+        return propFunctionAndThisOptional == null ? Undefined.instance : propFunctionAndThisOptional.call(context, scriptable, ScriptRuntime.lastStoredScriptable(context), ScriptRuntime.emptyArgs);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object callSpecial(Context context, Callable callable, Scriptable scriptable, Object[] objArr, Scriptable scriptable2, Scriptable scriptable3, int i, String str, int i2, boolean z) {
+        return ScriptRuntime.callSpecial(context, callable, scriptable, objArr, scriptable2, scriptable3, i, str, i2, z);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Scriptable createNativeGenerator(NativeFunction nativeFunction, Scriptable scriptable, Scriptable scriptable2, int i, int i2) {
+        GeneratorState generatorState = new GeneratorState(scriptable2, i, i2);
+        return Context.getCurrentContext().getLanguageVersion() >= 200 ? new ES6Generator(scriptable, nativeFunction, generatorState) : new NativeGenerator(scriptable, nativeFunction, generatorState);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private static int[] decodeIntArray(String str, int i) {
+        if (i == 0) {
+            if (str == null) {
+                return null;
+            }
+            d04.a();
+            return null;
+        }
+        if (str.length() != (i * 2) + 1 && str.charAt(0) != 1) {
+            d04.a();
+            return null;
+        }
+        int[] iArr = new int[i];
+        for (int i2 = 0; i2 != i; i2++) {
+            int i3 = i2 * 2;
+            iArr[i2] = str.charAt(i3 + 2) | (str.charAt(i3 + 1) << 16);
+        }
+        return iArr;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Deprecated
+    public static Object elemIncrDecr(Object obj, double d, Context context, int i) {
+        return elemIncrDecr(obj, d, context, ScriptRuntime.getTopCallScope(context), i);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static String encodeIntArray(int[] iArr) {
+        if (iArr == null) {
+            return null;
+        }
+        int length = iArr.length;
+        char[] cArr = new char[(length * 2) + 1];
+        cArr[0] = 1;
+        for (int i = 0; i != length; i++) {
+            int i2 = iArr[i];
+            int i3 = i * 2;
+            cArr[i3 + 1] = (char) (i2 >>> 16);
+            cArr[i3 + 2] = (char) i2;
+        }
+        return new String(cArr);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object[] getGeneratorLocalsState(Object obj) {
+        GeneratorState generatorState = (GeneratorState) obj;
+        if (generatorState.localsState == null) {
+            generatorState.localsState = new Object[generatorState.maxLocals];
+        }
+        return generatorState.localsState;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object getGeneratorReturnValue(Object obj) {
+        Object obj2 = ((GeneratorState) obj).returnValue;
+        return obj2 == null ? Undefined.instance : obj2;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object[] getGeneratorStackState(Object obj) {
+        GeneratorState generatorState = (GeneratorState) obj;
+        if (generatorState.stackState == null) {
+            generatorState.stackState = new Object[generatorState.maxStack];
+        }
+        return generatorState.stackState;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static void initFunction(NativeFunction nativeFunction, int i, Scriptable scriptable, Context context) {
+        ScriptRuntime.initFunction(context, scriptable, nativeFunction, i, false);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static boolean isNullOrUndefined(Object obj) {
+        return obj == null || Undefined.isUndefined(obj);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static void main(final Script script, final String[] strArr) {
+        ContextFactory.getGlobal().call(new ContextAction() { // from class: r63
+            /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+            @Override // org.mozilla.javascript.ContextAction
+            public final Object run(Context context) {
+                return OptRuntime.b(strArr, script, context);
+            }
+        });
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Scriptable newArrayLiteral(Object[] objArr, String str, int i, Context context, Scriptable scriptable) {
+        return ScriptRuntime.newArrayLiteral(objArr, decodeIntArray(str, i), context, scriptable);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object newObjectSpecial(Context context, Object obj, Object[] objArr, Scriptable scriptable, Scriptable scriptable2, int i) {
+        return ScriptRuntime.newSpecial(context, obj, objArr, scriptable, i);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Object[] padStart(Object[] objArr, int i) {
+        Object[] objArr2 = new Object[objArr.length + i];
+        System.arraycopy(objArr, 0, objArr2, i, objArr.length);
+        return objArr2;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static void setGeneratorReturnValue(Object obj, Object obj2) {
+        ((GeneratorState) obj).returnValue = obj2;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static void throwStopIteration(Object obj, Object obj2) {
+        Object generatorReturnValue = getGeneratorReturnValue(obj2);
+        throw new JavaScriptException(generatorReturnValue == Undefined.instance ? NativeIterator.getStopIterationObject((Scriptable) obj) : new NativeIterator.StopIteration(generatorReturnValue), "", 0);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static Double wrapDouble(double d) {
+        return Double.isNaN(d) ? ScriptRuntime.NaNobj : Double.valueOf(d);
+    }
+
+    public static Object elemIncrDecr(Object obj, double d, Context context, Scriptable scriptable, int i) {
+        return ScriptRuntime.elemIncrDecr(obj, Double.valueOf(d), context, scriptable, i);
+    }
+
+    public static Object add(double d, Object obj, Context context) {
+        if (obj instanceof Double) {
+            return Double.valueOf(d + ((Double) obj).doubleValue());
+        }
+        if (obj instanceof Integer) {
+            return Double.valueOf(d + ((double) ((Integer) obj).intValue()));
+        }
+        return ScriptRuntime.add(Double.valueOf(d), obj, context);
+    }
+}

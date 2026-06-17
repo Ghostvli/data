@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@drawable/shape_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp">
+    <com.google.android.material.textview.MaterialTextView
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:singleLine="true"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:textSize="12sp"
+        android:textColor="@color/white_90"
+        android:id="@+id/site"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:singleLine="true"/>
+    <com.google.android.material.textview.MaterialTextView
+        android:textSize="12sp"
+        android:textColor="@color/white_80"
+        android:id="@+id/remark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:singleLine="true"/>
+</androidx.appcompat.widget.LinearLayoutCompat>

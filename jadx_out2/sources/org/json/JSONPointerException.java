@@ -1,0 +1,16 @@
+package org.json;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public class JSONPointerException extends JSONException {
+    private static final long serialVersionUID = 8872944667561856751L;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public JSONPointerException(String str) {
+        super(str);
+    }
+
+    public JSONPointerException(String str, Throwable th) {
+        super(str, th);
+    }
+}

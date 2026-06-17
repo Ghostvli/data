@@ -1,0 +1,430 @@
+package org.xmlpull.v1.sax2;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.DTDHandler;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotSupportedException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public class Driver implements Locator, XMLReader, Attributes {
+    protected static final String APACHE_DYNAMIC_VALIDATION_FEATURE = "http://apache.org/xml/features/validation/dynamic";
+    protected static final String APACHE_SCHEMA_VALIDATION_FEATURE = "http://apache.org/xml/features/validation/schema";
+    protected static final String DECLARATION_HANDLER_PROPERTY = "http://xml.org/sax/properties/declaration-handler";
+    protected static final String LEXICAL_HANDLER_PROPERTY = "http://xml.org/sax/properties/lexical-handler";
+    protected static final String NAMESPACES_FEATURE = "http://xml.org/sax/features/namespaces";
+    protected static final String NAMESPACE_PREFIXES_FEATURE = "http://xml.org/sax/features/namespace-prefixes";
+    protected static final String VALIDATION_FEATURE = "http://xml.org/sax/features/validation";
+    protected ContentHandler contentHandler = new DefaultHandler();
+    protected ErrorHandler errorHandler = new DefaultHandler();
+    protected XmlPullParser pp;
+    protected String systemId;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public Driver() {
+        XmlPullParserFactory xmlPullParserFactoryNewInstance = XmlPullParserFactory.newInstance();
+        xmlPullParserFactoryNewInstance.setNamespaceAware(true);
+        this.pp = xmlPullParserFactoryNewInstance.newPullParser();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.Locator
+    public int getColumnNumber() {
+        return this.pp.getColumnNumber();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.XMLReader
+    public ContentHandler getContentHandler() {
+        return this.contentHandler;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.XMLReader
+    public DTDHandler getDTDHandler() {
+        return null;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.XMLReader
+    public EntityResolver getEntityResolver() {
+        return null;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.XMLReader
+    public ErrorHandler getErrorHandler() {
+        return this.errorHandler;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.XMLReader
+    public boolean getFeature(String str) {
+        if (NAMESPACES_FEATURE.equals(str)) {
+            return this.pp.getFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES);
+        }
+        if (NAMESPACE_PREFIXES_FEATURE.equals(str)) {
+            return this.pp.getFeature(XmlPullParser.FEATURE_REPORT_NAMESPACE_ATTRIBUTES);
+        }
+        boolean zEquals = VALIDATION_FEATURE.equals(str);
+        XmlPullParser xmlPullParser = this.pp;
+        return zEquals ? xmlPullParser.getFeature(XmlPullParser.FEATURE_VALIDATION) : xmlPullParser.getFeature(str);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.Attributes
+    public int getIndex(String str, String str2) {
+        for (int i = 0; i < this.pp.getAttributeCount(); i++) {
+            if (this.pp.getAttributeNamespace(i).equals(str) && this.pp.getAttributeName(i).equals(str2)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.Attributes
+    public int getLength() {
+        return this.pp.getAttributeCount();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.Locator
+    public int getLineNumber() {
+        return this.pp.getLineNumber();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.Attributes
+    public String getLocalName(int i) {
+        return this.pp.getAttributeName(i);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.XMLReader
+    public Object getProperty(String str) {
+        if (DECLARATION_HANDLER_PROPERTY.equals(str) || LEXICAL_HANDLER_PROPERTY.equals(str)) {
+            return null;
+        }
+        return this.pp.getProperty(str);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.Locator
+    public String getPublicId() {
+        return null;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.Attributes
+    public String getQName(int i) {
+        String attributePrefix = this.pp.getAttributePrefix(i);
+        if (attributePrefix == null) {
+            return this.pp.getAttributeName(i);
+        }
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append(attributePrefix);
+        stringBuffer.append(':');
+        stringBuffer.append(this.pp.getAttributeName(i));
+        return stringBuffer.toString();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.Locator
+    public String getSystemId() {
+        return this.systemId;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.Attributes
+    public String getType(String str, String str2) {
+        for (int i = 0; i < this.pp.getAttributeCount(); i++) {
+            if (this.pp.getAttributeNamespace(i).equals(str) && this.pp.getAttributeName(i).equals(str2)) {
+                return this.pp.getAttributeType(i);
+            }
+        }
+        return null;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.Attributes
+    public String getURI(int i) {
+        return this.pp.getAttributeNamespace(i);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.Attributes
+    public String getValue(String str) {
+        return this.pp.getAttributeValue(null, str);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.XMLReader
+    public void parse(InputSource inputSource) throws SAXException, IOException {
+        this.systemId = inputSource.getSystemId();
+        this.contentHandler.setDocumentLocator(this);
+        Reader characterStream = inputSource.getCharacterStream();
+        try {
+            if (characterStream == null) {
+                InputStream byteStream = inputSource.getByteStream();
+                String encoding = inputSource.getEncoding();
+                if (byteStream == null) {
+                    String systemId = inputSource.getSystemId();
+                    this.systemId = systemId;
+                    if (systemId == null) {
+                        this.errorHandler.fatalError(new SAXParseException("null source systemId", this));
+                        return;
+                    }
+                    try {
+                        try {
+                            byteStream = new URL(this.systemId).openStream();
+                        } catch (MalformedURLException unused) {
+                            byteStream = new FileInputStream(this.systemId);
+                        }
+                    } catch (FileNotFoundException e) {
+                        StringBuffer stringBuffer = new StringBuffer("could not open file with systemId ");
+                        stringBuffer.append(this.systemId);
+                        this.errorHandler.fatalError(new SAXParseException(stringBuffer.toString(), this, e));
+                        return;
+                    }
+                }
+                this.pp.setInput(byteStream, encoding);
+            } else {
+                this.pp.setInput(characterStream);
+            }
+            try {
+                this.contentHandler.startDocument();
+                this.pp.next();
+                if (this.pp.getEventType() == 2) {
+                    parseSubTree(this.pp);
+                    this.contentHandler.endDocument();
+                } else {
+                    StringBuffer stringBuffer2 = new StringBuffer("expected start tag not");
+                    stringBuffer2.append(this.pp.getPositionDescription());
+                    this.errorHandler.fatalError(new SAXParseException(stringBuffer2.toString(), this));
+                }
+            } catch (XmlPullParserException e2) {
+                StringBuffer stringBuffer3 = new StringBuffer("parsing initialization error: ");
+                stringBuffer3.append(e2);
+                this.errorHandler.fatalError(new SAXParseException(stringBuffer3.toString(), this, e2));
+            }
+        } catch (XmlPullParserException e3) {
+            StringBuffer stringBuffer4 = new StringBuffer("parsing initialization error: ");
+            stringBuffer4.append(e3);
+            this.errorHandler.fatalError(new SAXParseException(stringBuffer4.toString(), this, e3));
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public void parseSubTree(XmlPullParser xmlPullParser) throws SAXException {
+        this.pp = xmlPullParser;
+        boolean feature = xmlPullParser.getFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES);
+        try {
+            if (xmlPullParser.getEventType() != 2) {
+                StringBuffer stringBuffer = new StringBuffer("start tag must be read before skiping subtree");
+                stringBuffer.append(xmlPullParser.getPositionDescription());
+                throw new SAXException(stringBuffer.toString());
+            }
+            int[] iArr = new int[2];
+            StringBuffer stringBuffer2 = new StringBuffer(16);
+            int depth = xmlPullParser.getDepth() - 1;
+            int next = 2;
+            while (next != 1) {
+                if (next != 2) {
+                    if (next != 3) {
+                        if (next == 4) {
+                            this.contentHandler.characters(xmlPullParser.getTextCharacters(iArr), iArr[0], iArr[1]);
+                        }
+                    } else if (feature) {
+                        String name = xmlPullParser.getName();
+                        String prefix = xmlPullParser.getPrefix();
+                        if (prefix != null) {
+                            stringBuffer2.setLength(0);
+                            stringBuffer2.append(prefix);
+                            stringBuffer2.append(':');
+                            stringBuffer2.append(name);
+                        }
+                        this.contentHandler.endElement(xmlPullParser.getNamespace(), name, prefix != null ? name : stringBuffer2.toString());
+                        int namespaceCount = depth > xmlPullParser.getDepth() ? xmlPullParser.getNamespaceCount(xmlPullParser.getDepth()) : 0;
+                        for (int namespaceCount2 = xmlPullParser.getNamespaceCount(xmlPullParser.getDepth() - 1) - 1; namespaceCount2 >= namespaceCount; namespaceCount2--) {
+                            this.contentHandler.endPrefixMapping(xmlPullParser.getNamespacePrefix(namespaceCount2));
+                        }
+                    } else {
+                        this.contentHandler.endElement(xmlPullParser.getNamespace(), xmlPullParser.getName(), xmlPullParser.getName());
+                    }
+                } else if (feature) {
+                    int depth2 = xmlPullParser.getDepth();
+                    int i = depth2 - 1;
+                    int namespaceCount3 = xmlPullParser.getNamespaceCount(depth2);
+                    for (int namespaceCount4 = depth > i ? xmlPullParser.getNamespaceCount(i) : 0; namespaceCount4 < namespaceCount3; namespaceCount4++) {
+                        this.contentHandler.startPrefixMapping(xmlPullParser.getNamespacePrefix(namespaceCount4), xmlPullParser.getNamespaceUri(namespaceCount4));
+                    }
+                    String name2 = xmlPullParser.getName();
+                    String prefix2 = xmlPullParser.getPrefix();
+                    if (prefix2 != null) {
+                        stringBuffer2.setLength(0);
+                        stringBuffer2.append(prefix2);
+                        stringBuffer2.append(':');
+                        stringBuffer2.append(name2);
+                    }
+                    startElement(xmlPullParser.getNamespace(), name2, prefix2 != null ? name2 : stringBuffer2.toString());
+                } else {
+                    startElement(xmlPullParser.getNamespace(), xmlPullParser.getName(), xmlPullParser.getName());
+                }
+                next = xmlPullParser.next();
+                if (xmlPullParser.getDepth() <= depth) {
+                    return;
+                }
+            }
+        } catch (XmlPullParserException e) {
+            StringBuffer stringBuffer3 = new StringBuffer("parsing error: ");
+            stringBuffer3.append(e);
+            SAXParseException sAXParseException = new SAXParseException(stringBuffer3.toString(), this, e);
+            e.printStackTrace();
+            this.errorHandler.fatalError(sAXParseException);
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.XMLReader
+    public void setContentHandler(ContentHandler contentHandler) {
+        this.contentHandler = contentHandler;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.XMLReader
+    public void setDTDHandler(DTDHandler dTDHandler) {
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.XMLReader
+    public void setEntityResolver(EntityResolver entityResolver) {
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.XMLReader
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.XMLReader
+    public void setFeature(String str, boolean z) throws SAXNotSupportedException {
+        try {
+            if (NAMESPACES_FEATURE.equals(str)) {
+                this.pp.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, z);
+                return;
+            }
+            if (NAMESPACE_PREFIXES_FEATURE.equals(str)) {
+                if (this.pp.getFeature(XmlPullParser.FEATURE_REPORT_NAMESPACE_ATTRIBUTES) != z) {
+                    this.pp.setFeature(XmlPullParser.FEATURE_REPORT_NAMESPACE_ATTRIBUTES, z);
+                }
+            } else {
+                boolean zEquals = VALIDATION_FEATURE.equals(str);
+                XmlPullParser xmlPullParser = this.pp;
+                if (zEquals) {
+                    xmlPullParser.setFeature(XmlPullParser.FEATURE_VALIDATION, z);
+                } else {
+                    xmlPullParser.setFeature(str, z);
+                }
+            }
+        } catch (XmlPullParserException e) {
+            StringBuffer stringBuffer = new StringBuffer("problem with setting feature ");
+            stringBuffer.append(str);
+            stringBuffer.append(": ");
+            stringBuffer.append(e);
+            throw new SAXNotSupportedException(stringBuffer.toString());
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.xml.sax.XMLReader
+    public void setProperty(String str, Object obj) throws SAXNotSupportedException {
+        if (DECLARATION_HANDLER_PROPERTY.equals(str)) {
+            StringBuffer stringBuffer = new StringBuffer("not supported setting property ");
+            stringBuffer.append(str);
+            throw new SAXNotSupportedException(stringBuffer.toString());
+        }
+        if (LEXICAL_HANDLER_PROPERTY.equals(str)) {
+            StringBuffer stringBuffer2 = new StringBuffer("not supported setting property ");
+            stringBuffer2.append(str);
+            throw new SAXNotSupportedException(stringBuffer2.toString());
+        }
+        try {
+            this.pp.setProperty(str, obj);
+        } catch (XmlPullParserException e) {
+            StringBuffer stringBuffer3 = new StringBuffer("not supported set property ");
+            stringBuffer3.append(str);
+            stringBuffer3.append(": ");
+            stringBuffer3.append(e);
+            throw new SAXNotSupportedException(stringBuffer3.toString());
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public void startElement(String str, String str2, String str3) throws SAXException {
+        this.contentHandler.startElement(str, str2, str3, this);
+    }
+
+    @Override // org.xml.sax.Attributes
+    public String getValue(String str, String str2) {
+        return this.pp.getAttributeValue(str, str2);
+    }
+
+    @Override // org.xml.sax.Attributes
+    public String getValue(int i) {
+        return this.pp.getAttributeValue(i);
+    }
+
+    public Driver(XmlPullParser xmlPullParser) {
+        this.pp = xmlPullParser;
+    }
+
+    @Override // org.xml.sax.Attributes
+    public int getIndex(String str) {
+        for (int i = 0; i < this.pp.getAttributeCount(); i++) {
+            if (this.pp.getAttributeName(i).equals(str)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Override // org.xml.sax.Attributes
+    public String getType(int i) {
+        return this.pp.getAttributeType(i);
+    }
+
+    @Override // org.xml.sax.Attributes
+    public String getType(String str) {
+        for (int i = 0; i < this.pp.getAttributeCount(); i++) {
+            if (this.pp.getAttributeName(i).equals(str)) {
+                return this.pp.getAttributeType(i);
+            }
+        }
+        return null;
+    }
+
+    @Override // org.xml.sax.XMLReader
+    public void parse(String str) throws SAXException, IOException {
+        parse(new InputSource(str));
+    }
+}

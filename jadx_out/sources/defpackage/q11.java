@@ -1,0 +1,30 @@
+package defpackage;
+
+import android.graphics.Bitmap;
+import java.security.MessageDigest;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public class q11 extends nk {
+    public static final byte[] b = "com.bumptech.glide.load.resource.bitmap.FitCenter".getBytes(wq1.a);
+
+    @Override // defpackage.wq1
+    public void b(MessageDigest messageDigest) {
+        messageDigest.update(b);
+    }
+
+    @Override // defpackage.nk
+    public Bitmap c(kk kkVar, Bitmap bitmap, int i, int i2) {
+        return os4.f(kkVar, bitmap, i, i2);
+    }
+
+    @Override // defpackage.wq1
+    public boolean equals(Object obj) {
+        return obj instanceof q11;
+    }
+
+    @Override // defpackage.wq1
+    public int hashCode() {
+        return 1572326941;
+    }
+}

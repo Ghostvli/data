@@ -1,0 +1,71 @@
+package androidx.media;
+
+import java.util.Arrays;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public class AudioAttributesImplBase implements AudioAttributesImpl {
+    public int a = 0;
+    public int b = 0;
+    public int c = 0;
+    public int d = -1;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public int a() {
+        return this.b;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public int b() {
+        int i = this.c;
+        int iC = c();
+        if (iC == 6) {
+            i |= 4;
+        } else if (iC == 7) {
+            i |= 1;
+        }
+        return i & 273;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public int c() {
+        int i = this.d;
+        return i != -1 ? i : AudioAttributesCompat.a(false, this.c, this.a);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public int d() {
+        return this.a;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AudioAttributesImplBase)) {
+            return false;
+        }
+        AudioAttributesImplBase audioAttributesImplBase = (AudioAttributesImplBase) obj;
+        return this.b == audioAttributesImplBase.a() && this.c == audioAttributesImplBase.b() && this.a == audioAttributesImplBase.d() && this.d == audioAttributesImplBase.d;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public int hashCode() {
+        return Arrays.hashCode(new Object[]{Integer.valueOf(this.b), Integer.valueOf(this.c), Integer.valueOf(this.a), Integer.valueOf(this.d)});
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public String toString() {
+        StringBuilder sb = new StringBuilder("AudioAttributesCompat:");
+        if (this.d != -1) {
+            sb.append(" stream=");
+            sb.append(this.d);
+            sb.append(" derived");
+        }
+        sb.append(" usage=");
+        sb.append(AudioAttributesCompat.b(this.a));
+        sb.append(" content=");
+        sb.append(this.b);
+        sb.append(" flags=0x");
+        sb.append(Integer.toHexString(this.c).toUpperCase());
+        return sb.toString();
+    }
+}

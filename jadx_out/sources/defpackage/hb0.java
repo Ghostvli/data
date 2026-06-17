@@ -1,0 +1,16 @@
+package defpackage;
+
+/* JADX INFO: loaded from: classes3.dex */
+public class hb0 extends IllegalStateException {
+    public Throwable f;
+
+    public hb0(String str, Throwable th) {
+        super(str);
+        this.f = th;
+    }
+
+    @Override // java.lang.Throwable
+    public Throwable getCause() {
+        return this.f;
+    }
+}

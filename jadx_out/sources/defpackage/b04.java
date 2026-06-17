@@ -1,0 +1,43 @@
+package defpackage;
+
+import defpackage.yz3;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public interface b04 extends yz3 {
+
+    /* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+    public static class a extends yz3.b implements b04 {
+        public a() {
+            super(-9223372036854775807L);
+        }
+
+        @Override // defpackage.b04
+        public long a(long j) {
+            return 0L;
+        }
+
+        @Override // defpackage.b04
+        public long c() {
+            return -1L;
+        }
+
+        @Override // defpackage.b04
+        public long d() {
+            return 0L;
+        }
+
+        @Override // defpackage.b04
+        public int h() {
+            return -2147483647;
+        }
+    }
+
+    long a(long j);
+
+    long c();
+
+    long d();
+
+    int h();
+}

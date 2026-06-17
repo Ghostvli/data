@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" name="org.jupnp.util.SpecificationViolationReporterConfig" activate="activate" modified="modified" configuration-pid="org.jupnp.util">
+  <property name="specificationViolationReporterEnabled" type="Boolean" value="true"/>
+  <implementation class="org.jupnp.util.SpecificationViolationReporterConfig"/>
+</scr:component>
+

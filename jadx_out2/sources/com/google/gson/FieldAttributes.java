@@ -1,0 +1,60 @@
+package com.google.gson;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Objects;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public final class FieldAttributes {
+    private final Field field;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public FieldAttributes(Field field) {
+        Objects.requireNonNull(field);
+        this.field = field;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public <T extends Annotation> T getAnnotation(Class<T> cls) {
+        return (T) this.field.getAnnotation(cls);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public Collection<Annotation> getAnnotations() {
+        return Arrays.asList(this.field.getAnnotations());
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public Class<?> getDeclaredClass() {
+        return this.field.getType();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public Type getDeclaredType() {
+        return this.field.getGenericType();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public Class<?> getDeclaringClass() {
+        return this.field.getDeclaringClass();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public String getName() {
+        return this.field.getName();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public boolean hasModifier(int i) {
+        return (this.field.getModifiers() & i) != 0;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public String toString() {
+        return this.field.toString();
+    }
+}

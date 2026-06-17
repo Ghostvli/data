@@ -1,0 +1,230 @@
+package org.mozilla.javascript.dtoa;
+
+import defpackage.ya0;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public class Decimal {
+    static final /* synthetic */ boolean $assertionsDisabled = false;
+    private static final int MASK_28 = 268435455;
+    public static final int MAX_CHARS = 32;
+    private final char[] buf = new char[32];
+    private final long digits;
+    private final int exponent;
+    private int length;
+    private final boolean negative;
+
+    /* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+    public enum Mode {
+        DEFAULT,
+        TO_EXPONENTIAL
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public Decimal(long j, int i, boolean z) {
+        this.digits = j;
+        this.exponent = i;
+        this.negative = z;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private void append(char c) {
+        char[] cArr = this.buf;
+        int i = this.length;
+        this.length = i + 1;
+        cArr[i] = c;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private void append8Digits(int i) {
+        int iY = y(i);
+        for (int i2 = 0; i2 < 8; i2++) {
+            int i3 = iY * 10;
+            appendDigit(i3 >>> 28);
+            iY = i3 & MASK_28;
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private void appendDigit(int i) {
+        char[] cArr = this.buf;
+        int i2 = this.length;
+        this.length = i2 + 1;
+        cArr[i2] = (char) (i + 48);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private void exponent(int i) {
+        append('e');
+        if (i < 0) {
+            append('-');
+            i = -i;
+        } else {
+            append('+');
+        }
+        if (i < 10) {
+            appendDigit(i);
+            return;
+        }
+        if (i >= 100) {
+            int i2 = (i * 1311) >>> 17;
+            appendDigit(i2);
+            i -= i2 * 100;
+        }
+        int i3 = (i * 103) >>> 10;
+        appendDigit(i3);
+        appendDigit(i - (i3 * 10));
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private void lowDigits(int i) {
+        if (i != 0) {
+            append8Digits(i);
+        }
+        trimZeroes();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private String makeString() {
+        return new String(this.buf, 0, this.length);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private String toExponential(int i, int i2, int i3, int i4) {
+        appendDigit(i);
+        append('.');
+        append8Digits(i2);
+        lowDigits(i3);
+        exponent(i4 - 1);
+        return makeString();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private String toFixed(int i, int i2, int i3, int i4) {
+        appendDigit(i);
+        int iY = y(i2);
+        int i5 = 1;
+        while (i5 < i4) {
+            int i6 = iY * 10;
+            appendDigit(i6 >>> 28);
+            iY = i6 & MASK_28;
+            i5++;
+        }
+        append('.');
+        while (i5 <= 8) {
+            int i7 = iY * 10;
+            appendDigit(i7 >>> 28);
+            iY = i7 & MASK_28;
+            i5++;
+        }
+        lowDigits(i3);
+        return makeString();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private String toFixedBigger(int i, int i2, int i3, int i4) {
+        appendDigit(i);
+        append8Digits(i2);
+        int iY = y(i3);
+        int i5 = 9;
+        while (i5 < i4) {
+            int i6 = iY * 10;
+            appendDigit(i6 >>> 28);
+            iY = i6 & MASK_28;
+            i5++;
+        }
+        append('.');
+        while (i5 <= 16) {
+            int i7 = iY * 10;
+            appendDigit(i7 >>> 28);
+            iY = i7 & MASK_28;
+            i5++;
+        }
+        trimZeroes();
+        return makeString();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private String toFixedBiggest(int i, int i2, int i3, int i4) {
+        appendDigit(i);
+        append8Digits(i2);
+        append8Digits(i3);
+        for (int i5 = 17; i5 < i4; i5++) {
+            append('0');
+        }
+        return makeString();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private String toFixedSmall(int i, int i2, int i3, int i4) {
+        appendDigit(0);
+        append('.');
+        while (i4 < 0) {
+            appendDigit(0);
+            i4++;
+        }
+        appendDigit(i);
+        append8Digits(i2);
+        lowDigits(i3);
+        return makeString();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private void trimZeroes() {
+        int i;
+        while (true) {
+            i = this.length;
+            if (i <= 0 || this.buf[i - 1] != '0') {
+                break;
+            } else {
+                this.length = i - 1;
+            }
+        }
+        if (i <= 0 || this.buf[i - 1] != '.') {
+            return;
+        }
+        this.length = i - 1;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private int y(int i) {
+        return ((int) (ya0.a(((long) (i + 1)) << 28, 193428131138340668L) >>> 20)) - 1;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public String toString(Mode mode) {
+        this.length = 0;
+        int iFlog10pow2 = MathUtils.flog10pow2(64 - Long.numberOfLeadingZeros(this.digits));
+        if (this.digits >= MathUtils.pow10(iFlog10pow2)) {
+            iFlog10pow2++;
+        }
+        long jPow10 = this.digits * MathUtils.pow10(17 - iFlog10pow2);
+        int i = this.exponent + iFlog10pow2;
+        long jA = ya0.a(jPow10, 193428131138340668L) >>> 20;
+        int i2 = (int) (jPow10 - (jA * 100000000));
+        int i3 = (int) ((1441151881 * jA) >>> 57);
+        int i4 = (int) (jA - (((long) i3) * 100000000));
+        if (this.negative) {
+            append('-');
+        }
+        if (mode == Mode.DEFAULT) {
+            if (i > 0 && i <= 8) {
+                return toFixed(i3, i4, i2, i);
+            }
+            if (8 < i && i <= 16) {
+                return toFixedBigger(i3, i4, i2, i);
+            }
+            if (16 < i && i <= 21) {
+                return toFixedBiggest(i3, i4, i2, i);
+            }
+            if (-6 < i && i <= 0) {
+                return toFixedSmall(i3, i4, i2, i);
+            }
+        }
+        return toExponential(i3, i4, i2, i);
+    }
+
+    public String toString() {
+        return toString(Mode.DEFAULT);
+    }
+}

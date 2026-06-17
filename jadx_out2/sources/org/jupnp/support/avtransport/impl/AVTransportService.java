@@ -1,0 +1,274 @@
+package org.jupnp.support.avtransport.impl;
+
+import defpackage.j02;
+import defpackage.n02;
+import java.net.URI;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.jupnp.model.types.ErrorCode;
+import org.jupnp.model.types.UnsignedIntegerFourBytes;
+import org.jupnp.support.avtransport.AVTransportErrorCode;
+import org.jupnp.support.avtransport.AVTransportException;
+import org.jupnp.support.avtransport.AbstractAVTransportService;
+import org.jupnp.support.avtransport.impl.state.AbstractState;
+import org.jupnp.support.lastchange.LastChange;
+import org.jupnp.support.model.AVTransport;
+import org.jupnp.support.model.DeviceCapabilities;
+import org.jupnp.support.model.MediaInfo;
+import org.jupnp.support.model.PlayMode;
+import org.jupnp.support.model.PositionInfo;
+import org.jupnp.support.model.RecordQualityMode;
+import org.jupnp.support.model.SeekMode;
+import org.jupnp.support.model.StorageMedium;
+import org.jupnp.support.model.TransportAction;
+import org.jupnp.support.model.TransportInfo;
+import org.jupnp.support.model.TransportSettings;
+import org.jupnp.util.statemachine.StateMachineBuilder;
+import org.jupnp.util.statemachine.TransitionException;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public class AVTransportService<T extends AVTransport> extends AbstractAVTransportService {
+    final Class<? extends AbstractState<?>> initialState;
+    private final j02 logger;
+    final Class<? extends AVTransportStateMachine> stateMachineDefinition;
+    private final Map<Long, AVTransportStateMachine> stateMachines;
+    final Class<? extends AVTransport> transportClass;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    /* JADX DEBUG: Multi-variable search result rejected for r4v0, resolved type: java.lang.Class<T extends org.jupnp.support.model.AVTransport> */
+    /* JADX WARN: Multi-variable type inference failed */
+    public AVTransportService(Class<? extends AVTransportStateMachine> cls, Class<? extends AbstractState<?>> cls2, Class<T> cls3) {
+        this.logger = n02.k(AVTransportService.class);
+        this.stateMachines = new ConcurrentHashMap();
+        this.stateMachineDefinition = cls;
+        this.initialState = cls2;
+        this.transportClass = cls3;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public AVTransportStateMachine createStateMachine(UnsignedIntegerFourBytes unsignedIntegerFourBytes) {
+        return (AVTransportStateMachine) StateMachineBuilder.build(this.stateMachineDefinition, this.initialState, new Class[]{this.transportClass}, new Object[]{createTransport(unsignedIntegerFourBytes, getLastChange())});
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public AVTransport createTransport(UnsignedIntegerFourBytes unsignedIntegerFourBytes, LastChange lastChange) {
+        return new AVTransport(unsignedIntegerFourBytes, lastChange, StorageMedium.NETWORK);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public AVTransportStateMachine findStateMachine(UnsignedIntegerFourBytes unsignedIntegerFourBytes, boolean z) {
+        AVTransportStateMachine aVTransportStateMachineCreateStateMachine;
+        synchronized (this.stateMachines) {
+            try {
+                Long value = unsignedIntegerFourBytes.getValue();
+                long jLongValue = value.longValue();
+                aVTransportStateMachineCreateStateMachine = this.stateMachines.get(value);
+                if (aVTransportStateMachineCreateStateMachine == null && jLongValue == 0 && z) {
+                    this.logger.b("Creating default transport instance with ID '0'");
+                    aVTransportStateMachineCreateStateMachine = createStateMachine(unsignedIntegerFourBytes);
+                    this.stateMachines.put(value, aVTransportStateMachineCreateStateMachine);
+                } else if (aVTransportStateMachineCreateStateMachine == null) {
+                    throw new AVTransportException(AVTransportErrorCode.INVALID_INSTANCE_ID);
+                }
+                this.logger.q("Found transport control with ID '{}'", value);
+            } catch (Throwable th) {
+                throw th;
+            }
+        }
+        return aVTransportStateMachineCreateStateMachine;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.lastchange.LastChangeDelegator
+    public UnsignedIntegerFourBytes[] getCurrentInstanceIds() {
+        UnsignedIntegerFourBytes[] unsignedIntegerFourBytesArr;
+        synchronized (this.stateMachines) {
+            try {
+                unsignedIntegerFourBytesArr = new UnsignedIntegerFourBytes[this.stateMachines.size()];
+                Iterator<Long> it = this.stateMachines.keySet().iterator();
+                int i = 0;
+                while (it.hasNext()) {
+                    unsignedIntegerFourBytesArr[i] = new UnsignedIntegerFourBytes(it.next().longValue());
+                    i++;
+                }
+            } catch (Throwable th) {
+                throw th;
+            }
+        }
+        return unsignedIntegerFourBytesArr;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public TransportAction[] getCurrentTransportActions(UnsignedIntegerFourBytes unsignedIntegerFourBytes) {
+        try {
+            return findStateMachine(unsignedIntegerFourBytes).getCurrentState().getCurrentTransportActions();
+        } catch (TransitionException unused) {
+            return new TransportAction[0];
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public DeviceCapabilities getDeviceCapabilities(UnsignedIntegerFourBytes unsignedIntegerFourBytes) {
+        return findStateMachine(unsignedIntegerFourBytes).getCurrentState().getTransport().getDeviceCapabilities();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public MediaInfo getMediaInfo(UnsignedIntegerFourBytes unsignedIntegerFourBytes) {
+        return findStateMachine(unsignedIntegerFourBytes).getCurrentState().getTransport().getMediaInfo();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public PositionInfo getPositionInfo(UnsignedIntegerFourBytes unsignedIntegerFourBytes) {
+        return findStateMachine(unsignedIntegerFourBytes).getCurrentState().getTransport().getPositionInfo();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public TransportInfo getTransportInfo(UnsignedIntegerFourBytes unsignedIntegerFourBytes) {
+        return findStateMachine(unsignedIntegerFourBytes).getCurrentState().getTransport().getTransportInfo();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public TransportSettings getTransportSettings(UnsignedIntegerFourBytes unsignedIntegerFourBytes) {
+        return findStateMachine(unsignedIntegerFourBytes).getCurrentState().getTransport().getTransportSettings();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public void next(UnsignedIntegerFourBytes unsignedIntegerFourBytes) throws AVTransportException {
+        try {
+            findStateMachine(unsignedIntegerFourBytes).next();
+        } catch (TransitionException e) {
+            throw new AVTransportException(AVTransportErrorCode.TRANSITION_NOT_AVAILABLE, e.getMessage());
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public void pause(UnsignedIntegerFourBytes unsignedIntegerFourBytes) throws AVTransportException {
+        try {
+            findStateMachine(unsignedIntegerFourBytes).pause();
+        } catch (TransitionException e) {
+            throw new AVTransportException(AVTransportErrorCode.TRANSITION_NOT_AVAILABLE, e.getMessage());
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public void play(UnsignedIntegerFourBytes unsignedIntegerFourBytes, String str) throws AVTransportException {
+        try {
+            findStateMachine(unsignedIntegerFourBytes).play(str);
+        } catch (TransitionException e) {
+            throw new AVTransportException(AVTransportErrorCode.TRANSITION_NOT_AVAILABLE, e.getMessage());
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public void previous(UnsignedIntegerFourBytes unsignedIntegerFourBytes) throws AVTransportException {
+        try {
+            findStateMachine(unsignedIntegerFourBytes).previous();
+        } catch (TransitionException e) {
+            throw new AVTransportException(AVTransportErrorCode.TRANSITION_NOT_AVAILABLE, e.getMessage());
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public void record(UnsignedIntegerFourBytes unsignedIntegerFourBytes) throws AVTransportException {
+        try {
+            findStateMachine(unsignedIntegerFourBytes).record();
+        } catch (TransitionException e) {
+            throw new AVTransportException(AVTransportErrorCode.TRANSITION_NOT_AVAILABLE, e.getMessage());
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public void seek(UnsignedIntegerFourBytes unsignedIntegerFourBytes, String str, String str2) throws AVTransportException {
+        try {
+            try {
+                findStateMachine(unsignedIntegerFourBytes).seek(SeekMode.valueOrExceptionOf(str), str2);
+            } catch (TransitionException e) {
+                throw new AVTransportException(AVTransportErrorCode.TRANSITION_NOT_AVAILABLE, e.getMessage());
+            }
+        } catch (IllegalArgumentException unused) {
+            throw new AVTransportException(AVTransportErrorCode.SEEKMODE_NOT_SUPPORTED, "Unsupported seek mode: " + str);
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public void setAVTransportURI(UnsignedIntegerFourBytes unsignedIntegerFourBytes, String str, String str2) throws AVTransportException {
+        try {
+            try {
+                findStateMachine(unsignedIntegerFourBytes, true).setTransportURI(new URI(str), str2);
+            } catch (TransitionException e) {
+                throw new AVTransportException(AVTransportErrorCode.TRANSITION_NOT_AVAILABLE, e.getMessage());
+            }
+        } catch (Exception unused) {
+            throw new AVTransportException(ErrorCode.INVALID_ARGS, "CurrentURI can not be null or malformed");
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public void setNextAVTransportURI(UnsignedIntegerFourBytes unsignedIntegerFourBytes, String str, String str2) throws AVTransportException {
+        try {
+            try {
+                findStateMachine(unsignedIntegerFourBytes, true).setNextTransportURI(new URI(str), str2);
+            } catch (TransitionException e) {
+                throw new AVTransportException(AVTransportErrorCode.TRANSITION_NOT_AVAILABLE, e.getMessage());
+            }
+        } catch (Exception unused) {
+            throw new AVTransportException(ErrorCode.INVALID_ARGS, "NextURI can not be null or malformed");
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public void setPlayMode(UnsignedIntegerFourBytes unsignedIntegerFourBytes, String str) throws AVTransportException {
+        AVTransport transport = findStateMachine(unsignedIntegerFourBytes).getCurrentState().getTransport();
+        try {
+            transport.setTransportSettings(new TransportSettings(PlayMode.valueOf(str), transport.getTransportSettings().getRecQualityMode()));
+        } catch (IllegalArgumentException unused) {
+            throw new AVTransportException(AVTransportErrorCode.PLAYMODE_NOT_SUPPORTED, "Unsupported play mode: " + str);
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public void setRecordQualityMode(UnsignedIntegerFourBytes unsignedIntegerFourBytes, String str) throws AVTransportException {
+        AVTransport transport = findStateMachine(unsignedIntegerFourBytes).getCurrentState().getTransport();
+        try {
+            transport.setTransportSettings(new TransportSettings(transport.getTransportSettings().getPlayMode(), RecordQualityMode.valueOrExceptionOf(str)));
+        } catch (IllegalArgumentException unused) {
+            throw new AVTransportException(AVTransportErrorCode.RECORDQUALITYMODE_NOT_SUPPORTED, "Unsupported record quality mode: " + str);
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.avtransport.AbstractAVTransportService
+    public void stop(UnsignedIntegerFourBytes unsignedIntegerFourBytes) throws AVTransportException {
+        try {
+            findStateMachine(unsignedIntegerFourBytes).stop();
+        } catch (TransitionException e) {
+            throw new AVTransportException(AVTransportErrorCode.TRANSITION_NOT_AVAILABLE, e.getMessage());
+        }
+    }
+
+    public AVTransportService(Class<? extends AVTransportStateMachine> cls, Class<? extends AbstractState<?>> cls2) {
+        this(cls, cls2, AVTransport.class);
+    }
+
+    public AVTransportStateMachine findStateMachine(UnsignedIntegerFourBytes unsignedIntegerFourBytes) {
+        return findStateMachine(unsignedIntegerFourBytes, true);
+    }
+}

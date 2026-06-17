@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="doh_name">
+        <item>系統</item>
+        <item>騰訊</item>
+        <item>阿里</item>
+        <item>360</item>
+    </array>
+    <array name="doh_url">
+        <item />
+        <item>https://doh.pub/dns-query</item>
+        <item>https://dns.alidns.com/dns-query</item>
+        <item>https://doh.360.cn/dns-query</item>
+    </array>
+    <array name="exo_controls_playback_speeds">
+        <item>0.25 倍</item>
+        <item>0.5 倍</item>
+        <item>0.75 倍</item>
+        <item>正常</item>
+        <item>1.25 倍</item>
+        <item>1.5 倍</item>
+        <item>2 倍</item>
+    </array>
+    <array name="select_background">
+        <item>關閉</item>
+        <item>開啟</item>
+        <item>子母畫面</item>
+    </array>
+    <array name="select_caption">
+        <item>預設</item>
+        <item>系統</item>
+    </array>
+    <array name="select_decode">
+        <item>軟解</item>
+        <item>硬解</item>
+    </array>
+    <array name="select_reset">
+        <item>刷新</item>
+        <item>重播</item>
+    </array>
+    <array name="select_scale">
+        <item>原始</item>
+        <item>16:9</item>
+        <item>4:3</item>
+        <item>填充</item>
+        <item>裁剪</item>
+    </array>
+    <array name="select_size">
+        <item>小</item>
+        <item>中</item>
+        <item>大</item>
+        <item>特大</item>
+    </array>
+    <array name="select_track">
+        <item>選擇音軌</item>
+        <item>選擇視軌</item>
+        <item>選擇字幕</item>
+    </array>
+</resources>

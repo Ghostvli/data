@@ -1,0 +1,85 @@
+package com.google.zxing.qrcode.decoder;
+
+import com.google.zxing.qrcode.decoder.Version;
+import defpackage.d04;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+final class DataBlock {
+    private final byte[] codewords;
+    private final int numDataCodewords;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private DataBlock(int i, byte[] bArr) {
+        this.numDataCodewords = i;
+        this.codewords = bArr;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static DataBlock[] getDataBlocks(byte[] bArr, Version version, ErrorCorrectionLevel errorCorrectionLevel) {
+        if (bArr.length != version.getTotalCodewords()) {
+            d04.a();
+            return null;
+        }
+        Version.ECBlocks eCBlocksForLevel = version.getECBlocksForLevel(errorCorrectionLevel);
+        Version.ECB[] eCBlocks = eCBlocksForLevel.getECBlocks();
+        int count = 0;
+        for (Version.ECB ecb : eCBlocks) {
+            count += ecb.getCount();
+        }
+        DataBlock[] dataBlockArr = new DataBlock[count];
+        int i = 0;
+        for (Version.ECB ecb2 : eCBlocks) {
+            int i2 = 0;
+            while (i2 < ecb2.getCount()) {
+                int dataCodewords = ecb2.getDataCodewords();
+                dataBlockArr[i] = new DataBlock(dataCodewords, new byte[eCBlocksForLevel.getECCodewordsPerBlock() + dataCodewords]);
+                i2++;
+                i++;
+            }
+        }
+        int length = dataBlockArr[0].codewords.length;
+        int i3 = count - 1;
+        while (i3 >= 0 && dataBlockArr[i3].codewords.length != length) {
+            i3--;
+        }
+        int i4 = i3 + 1;
+        int eCCodewordsPerBlock = length - eCBlocksForLevel.getECCodewordsPerBlock();
+        int i5 = 0;
+        for (int i6 = 0; i6 < eCCodewordsPerBlock; i6++) {
+            int i7 = 0;
+            while (i7 < i) {
+                dataBlockArr[i7].codewords[i6] = bArr[i5];
+                i7++;
+                i5++;
+            }
+        }
+        int i8 = i4;
+        while (i8 < i) {
+            dataBlockArr[i8].codewords[eCCodewordsPerBlock] = bArr[i5];
+            i8++;
+            i5++;
+        }
+        int length2 = dataBlockArr[0].codewords.length;
+        while (eCCodewordsPerBlock < length2) {
+            int i9 = 0;
+            while (i9 < i) {
+                dataBlockArr[i9].codewords[i9 < i4 ? eCCodewordsPerBlock : eCCodewordsPerBlock + 1] = bArr[i5];
+                i9++;
+                i5++;
+            }
+            eCCodewordsPerBlock++;
+        }
+        return dataBlockArr;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public byte[] getCodewords() {
+        return this.codewords;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public int getNumDataCodewords() {
+        return this.numDataCodewords;
+    }
+}

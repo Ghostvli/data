@@ -1,0 +1,38 @@
+package org.jupnp.support.model.dlna;
+
+import defpackage.g80;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public class DLNAConversionIndicatorAttribute extends DLNAAttribute<DLNAConversionIndicator> {
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public DLNAConversionIndicatorAttribute() {
+        setValue(DLNAConversionIndicator.NONE);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.model.dlna.DLNAAttribute
+    public String getString() {
+        return Integer.toString(getValue().getCode());
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.jupnp.support.model.dlna.DLNAAttribute
+    public void setString(String str, String str2) {
+        DLNAConversionIndicator dLNAConversionIndicatorValueOf;
+        try {
+            dLNAConversionIndicatorValueOf = DLNAConversionIndicator.valueOf(Integer.parseInt(str));
+        } catch (NumberFormatException unused) {
+            dLNAConversionIndicatorValueOf = null;
+        }
+        if (dLNAConversionIndicatorValueOf != null) {
+            setValue(dLNAConversionIndicatorValueOf);
+        } else {
+            g80.a("Can't parse DLNA play speed integer from: ", str);
+        }
+    }
+
+    public DLNAConversionIndicatorAttribute(DLNAConversionIndicator dLNAConversionIndicator) {
+        setValue(dLNAConversionIndicator);
+    }
+}

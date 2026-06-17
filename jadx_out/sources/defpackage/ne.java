@@ -1,0 +1,19 @@
+package defpackage;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public abstract class ne {
+    public static final void a(AutoCloseable autoCloseable, Throwable th) throws Exception {
+        if (autoCloseable != null) {
+            if (th == null) {
+                d45.a(autoCloseable);
+                return;
+            }
+            try {
+                d45.a(autoCloseable);
+            } catch (Throwable th2) {
+                mv0.a(th, th2);
+            }
+        }
+    }
+}

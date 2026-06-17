@@ -1,0 +1,90 @@
+package org.simpleframework.xml.core;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+abstract class ParameterContact<T extends Annotation> implements Contact {
+    protected final Constructor factory;
+    protected final int index;
+    protected final T label;
+    protected final Annotation[] labels;
+    protected final Class owner;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public ParameterContact(T t, Constructor constructor, int i) {
+        this.labels = constructor.getParameterAnnotations()[i];
+        this.owner = constructor.getDeclaringClass();
+        this.factory = constructor;
+        this.index = i;
+        this.label = t;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Contact
+    public Object get(Object obj) {
+        return null;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.strategy.Type
+    public <A extends Annotation> A getAnnotation(Class<A> cls) {
+        for (Annotation annotation : this.labels) {
+            A a = (A) annotation;
+            if (a.annotationType().equals(cls)) {
+                return a;
+            }
+        }
+        return null;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Contact
+    public Class getDeclaringClass() {
+        return this.owner;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Contact
+    public Class getDependent() {
+        return Reflector.getParameterDependent(this.factory, this.index);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Contact
+    public Class[] getDependents() {
+        return Reflector.getParameterDependents(this.factory, this.index);
+    }
+
+    @Override // org.simpleframework.xml.core.Contact
+    public abstract String getName();
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.strategy.Type
+    public Class getType() {
+        return this.factory.getParameterTypes()[this.index];
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Contact
+    public boolean isReadOnly() {
+        return false;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Contact
+    public void set(Object obj, Object obj2) {
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Contact, org.simpleframework.xml.strategy.Type
+    public String toString() {
+        return String.format("parameter %s of constructor %s", Integer.valueOf(this.index), this.factory);
+    }
+
+    @Override // org.simpleframework.xml.core.Contact
+    public Annotation getAnnotation() {
+        return this.label;
+    }
+}

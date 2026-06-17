@@ -1,0 +1,43 @@
+package org.mozilla.javascript.commonjs.module;
+
+import java.io.Serializable;
+import java.net.URI;
+import org.mozilla.javascript.Script;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public class ModuleScript implements Serializable {
+    private static final long serialVersionUID = 1;
+    private final URI base;
+    private final Script script;
+    private final URI uri;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public ModuleScript(Script script, URI uri, URI uri2) {
+        this.script = script;
+        this.uri = uri;
+        this.base = uri2;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public URI getBase() {
+        return this.base;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public Script getScript() {
+        return this.script;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public URI getUri() {
+        return this.uri;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public boolean isSandboxed() {
+        URI uri;
+        URI uri2 = this.base;
+        return (uri2 == null || (uri = this.uri) == null || uri2.relativize(uri).isAbsolute()) ? false : true;
+    }
+}

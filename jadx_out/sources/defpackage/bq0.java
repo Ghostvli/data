@@ -1,0 +1,16 @@
+package defpackage;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public class bq0 extends gr0 {
+    public bq0(mr0 mr0Var, hr0 hr0Var, long j, int i) {
+        ByteBuffer byteBufferAllocate = ByteBuffer.allocate(4);
+        byteBufferAllocate.order(hr0Var.a ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
+        long j2 = j + ((long) (i * 8));
+        this.a = mr0Var.y(byteBufferAllocate, j2);
+        this.b = mr0Var.y(byteBufferAllocate, j2 + 4);
+    }
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.2.0" localization="OSGI-INF/l10n/org.jupnp.UpnpServiceImpl$Config">
+  <OCD id="org.jupnp.upnpservice" name="jUPnP service configuration" description="Configuration for jUPnP OSGi service">
+    <AD id="initialSearchEnabled" type="Boolean" name="initialSearchEnabled" description="Enable initial search when starting jUPnP service." default="true"/>
+  </OCD>
+  <Designate pid="org.jupnp.upnpservice">
+    <Object ocdref="org.jupnp.upnpservice"/>
+  </Designate>
+</metatype:MetaData>
+

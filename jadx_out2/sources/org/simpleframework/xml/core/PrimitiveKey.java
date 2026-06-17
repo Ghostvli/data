@@ -1,0 +1,137 @@
+package org.simpleframework.xml.core;
+
+import org.simpleframework.xml.strategy.Type;
+import org.simpleframework.xml.stream.InputNode;
+import org.simpleframework.xml.stream.OutputNode;
+import org.simpleframework.xml.stream.Style;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+class PrimitiveKey implements Converter {
+    private final Context context;
+    private final Entry entry;
+    private final PrimitiveFactory factory;
+    private final Primitive root;
+    private final Style style;
+    private final Type type;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public PrimitiveKey(Context context, Entry entry, Type type) {
+        this.factory = new PrimitiveFactory(context, type);
+        this.root = new Primitive(context, type);
+        this.style = context.getStyle();
+        this.context = context;
+        this.entry = entry;
+        this.type = type;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private boolean isOverridden(OutputNode outputNode, Object obj) {
+        return this.factory.setOverride(this.type, obj, outputNode);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private Object readAttribute(InputNode inputNode, String str) {
+        InputNode attribute = inputNode.getAttribute(this.style.getAttribute(str));
+        if (attribute == null) {
+            return null;
+        }
+        return this.root.read(attribute);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private Object readElement(InputNode inputNode, String str) {
+        InputNode next = inputNode.getNext(this.style.getElement(str));
+        if (next == null) {
+            return null;
+        }
+        return this.root.read(next);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private boolean validateAttribute(InputNode inputNode, String str) {
+        InputNode attribute = inputNode.getAttribute(this.style.getElement(str));
+        if (attribute == null) {
+            return true;
+        }
+        return this.root.validate(attribute);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private boolean validateElement(InputNode inputNode, String str) {
+        InputNode next = inputNode.getNext(this.style.getElement(str));
+        if (next == null) {
+            return true;
+        }
+        return this.root.validate(next);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private void writeAttribute(OutputNode outputNode, Object obj) {
+        Class type = this.type.getType();
+        String text = this.factory.getText(obj);
+        String key = this.entry.getKey();
+        if (key == null) {
+            key = this.context.getName(type);
+        }
+        String attribute = this.style.getAttribute(key);
+        if (text != null) {
+            outputNode.setAttribute(attribute, text);
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private void writeElement(OutputNode outputNode, Object obj) {
+        Class type = this.type.getType();
+        String key = this.entry.getKey();
+        if (key == null) {
+            key = this.context.getName(type);
+        }
+        OutputNode child = outputNode.getChild(this.style.getElement(key));
+        if (obj == null || isOverridden(child, obj)) {
+            return;
+        }
+        this.root.write(child, obj);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Converter
+    public Object read(InputNode inputNode) {
+        Class type = this.type.getType();
+        String key = this.entry.getKey();
+        if (key == null) {
+            key = this.context.getName(type);
+        }
+        return !this.entry.isAttribute() ? readElement(inputNode, key) : readAttribute(inputNode, key);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Converter
+    public boolean validate(InputNode inputNode) {
+        Class type = this.type.getType();
+        String key = this.entry.getKey();
+        if (key == null) {
+            key = this.context.getName(type);
+        }
+        return !this.entry.isAttribute() ? validateElement(inputNode, key) : validateAttribute(inputNode, key);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Converter
+    public void write(OutputNode outputNode, Object obj) {
+        if (!this.entry.isAttribute()) {
+            writeElement(outputNode, obj);
+        } else if (obj != null) {
+            writeAttribute(outputNode, obj);
+        }
+    }
+
+    @Override // org.simpleframework.xml.core.Converter
+    public Object read(InputNode inputNode, Object obj) throws PersistenceException {
+        Class type = this.type.getType();
+        if (obj == null) {
+            return read(inputNode);
+        }
+        throw new PersistenceException("Can not read key of %s for %s", type, this.entry);
+    }
+}

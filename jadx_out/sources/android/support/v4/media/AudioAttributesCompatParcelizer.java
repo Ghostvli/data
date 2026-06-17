@@ -1,0 +1,16 @@
+package android.support.v4.media;
+
+import androidx.media.AudioAttributesCompat;
+import defpackage.lz4;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public final class AudioAttributesCompatParcelizer extends androidx.media.AudioAttributesCompatParcelizer {
+    public static AudioAttributesCompat read(lz4 lz4Var) {
+        return androidx.media.AudioAttributesCompatParcelizer.read(lz4Var);
+    }
+
+    public static void write(AudioAttributesCompat audioAttributesCompat, lz4 lz4Var) {
+        androidx.media.AudioAttributesCompatParcelizer.write(audioAttributesCompat, lz4Var);
+    }
+}

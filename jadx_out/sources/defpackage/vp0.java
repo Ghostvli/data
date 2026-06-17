@@ -1,0 +1,20 @@
+package defpackage;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public abstract class vp0 {
+    public static final boolean a = false;
+    public static final ThreadLocal[] b;
+
+    static {
+        ThreadLocal[] threadLocalArr = new ThreadLocal[4];
+        for (int i = 0; i < 4; i++) {
+            threadLocalArr[i] = new ThreadLocal();
+        }
+        b = threadLocalArr;
+    }
+
+    public static final boolean a() {
+        return a;
+    }
+}

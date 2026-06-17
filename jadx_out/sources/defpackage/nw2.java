@@ -1,0 +1,17 @@
+package defpackage;
+
+import androidx.lifecycle.l;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public class nw2 extends l {
+    @Override // androidx.lifecycle.l
+    public void j(Object obj) {
+        super.j(obj);
+    }
+
+    @Override // androidx.lifecycle.l
+    public void l(Object obj) {
+        super.l(obj);
+    }
+}

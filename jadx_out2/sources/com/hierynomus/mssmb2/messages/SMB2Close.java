@@ -1,0 +1,96 @@
+package com.hierynomus.mssmb2.messages;
+
+import com.hierynomus.msdtyp.FileTime;
+import com.hierynomus.msdtyp.MsDataTypes;
+import com.hierynomus.mssmb2.SMB2Dialect;
+import com.hierynomus.mssmb2.SMB2FileId;
+import com.hierynomus.mssmb2.SMB2MessageCommandCode;
+import com.hierynomus.mssmb2.SMB2Packet;
+import com.hierynomus.protocol.commons.buffer.Buffer;
+import com.hierynomus.smb.SMBBuffer;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public class SMB2Close extends SMB2Packet {
+    private long allocationSize;
+    private FileTime changeTime;
+    private FileTime creationTime;
+    private byte[] fileAttributes;
+    private SMB2FileId fileId;
+    private FileTime lastAccessTime;
+    private FileTime lastWriteTime;
+    private long size;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public SMB2Close(SMB2Dialect sMB2Dialect, long j, long j2, SMB2FileId sMB2FileId) {
+        super(24, sMB2Dialect, SMB2MessageCommandCode.SMB2_CLOSE, j, j2);
+        this.fileId = sMB2FileId;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public long getAllocationSize() {
+        return this.allocationSize;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public FileTime getChangeTime() {
+        return this.changeTime;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public FileTime getCreationTime() {
+        return this.creationTime;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public byte[] getFileAttributes() {
+        return this.fileAttributes;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public FileTime getLastAccessTime() {
+        return this.lastAccessTime;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public FileTime getLastWriteTime() {
+        return this.lastWriteTime;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public long getSize() {
+        return this.size;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // com.hierynomus.mssmb2.SMB2Packet
+    public void readMessage(SMBBuffer sMBBuffer) throws Buffer.BufferException {
+        sMBBuffer.readUInt16();
+        sMBBuffer.readUInt16();
+        sMBBuffer.skip(4);
+        this.creationTime = MsDataTypes.readFileTime(sMBBuffer);
+        this.lastAccessTime = MsDataTypes.readFileTime(sMBBuffer);
+        this.lastWriteTime = MsDataTypes.readFileTime(sMBBuffer);
+        this.changeTime = MsDataTypes.readFileTime(sMBBuffer);
+        this.allocationSize = sMBBuffer.readUInt64();
+        this.size = sMBBuffer.readUInt64();
+        this.fileAttributes = sMBBuffer.readRawBytes(4);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public void setFileId(SMB2FileId sMB2FileId) {
+        this.fileId = sMB2FileId;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // com.hierynomus.mssmb2.SMB2Packet
+    public void writeTo(SMBBuffer sMBBuffer) {
+        sMBBuffer.putUInt16(this.structureSize);
+        sMBBuffer.putUInt16(1);
+        sMBBuffer.putReserved4();
+        this.fileId.write(sMBBuffer);
+    }
+
+    public SMB2Close() {
+    }
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.2.0" localization="OSGI-INF/l10n/org.jupnp.util.SpecificationViolationReporterConfig$Config">
+  <OCD id="org.jupnp.util" name="jUPnP specification violation reporting configuration" description="Configuration for jUPnP specification violation reporting">
+    <AD id="specificationViolationReporterEnabled" type="Boolean" name="specificationViolationReporterEnabled" description="Enable specification violation reporting." default="true"/>
+  </OCD>
+  <Designate pid="org.jupnp.util">
+    <Object ocdref="org.jupnp.util"/>
+  </Designate>
+</metatype:MetaData>
+

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" name="org.jupnp.UpnpServiceImpl" activate="activate" deactivate="deactivate" configuration-pid="org.jupnp.upnpservice">
+  <property name="initialSearchEnabled" type="Boolean" value="true"/>
+  <service>
+    <provide interface="org.jupnp.UpnpService"/>
+  </service>
+  <reference name="UpnpServiceConfiguration" interface="org.jupnp.UpnpServiceConfiguration" bind="setUpnpServiceConfiguration" unbind="unsetUpnpServiceConfiguration"/>
+  <implementation class="org.jupnp.UpnpServiceImpl"/>
+</scr:component>
+

@@ -1,0 +1,43 @@
+package com.hierynomus.msfscc.fileinformation;
+
+import com.hierynomus.msdtyp.FileTime;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public class FileBasicInformation implements FileQueryableInformation, FileSettableInformation {
+    public static final FileTime DONT_SET = new FileTime(0);
+    public static final FileTime DONT_UPDATE = new FileTime(-1);
+    private final FileTime changeTime;
+    private final FileTime creationTime;
+    private long fileAttributes;
+    private final FileTime lastAccessTime;
+    private final FileTime lastWriteTime;
+
+    public FileBasicInformation(FileTime fileTime, FileTime fileTime2, FileTime fileTime3, FileTime fileTime4, long j) {
+        this.creationTime = fileTime;
+        this.lastAccessTime = fileTime2;
+        this.lastWriteTime = fileTime3;
+        this.changeTime = fileTime4;
+        this.fileAttributes = j;
+    }
+
+    public FileTime getChangeTime() {
+        return this.changeTime;
+    }
+
+    public FileTime getCreationTime() {
+        return this.creationTime;
+    }
+
+    public long getFileAttributes() {
+        return this.fileAttributes;
+    }
+
+    public FileTime getLastAccessTime() {
+        return this.lastAccessTime;
+    }
+
+    public FileTime getLastWriteTime() {
+        return this.lastWriteTime;
+    }
+}

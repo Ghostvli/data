@@ -1,0 +1,102 @@
+package org.mozilla.javascript.ast;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public class Name extends AstNode {
+    private String identifier;
+    private Scope scope;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public Name(int i, String str) {
+        super(i);
+        this.type = 44;
+        setIdentifier(str);
+        setLength(str.length());
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public Scope getDefiningScope() {
+        Scope enclosingScope = getEnclosingScope();
+        String identifier = getIdentifier();
+        if (enclosingScope == null) {
+            return null;
+        }
+        return enclosingScope.getDefiningScope(identifier);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public String getIdentifier() {
+        return this.identifier;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.mozilla.javascript.Node
+    public Scope getScope() {
+        return this.scope;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public boolean isLocalName() {
+        Scope definingScope = getDefiningScope();
+        return (definingScope == null || definingScope.getParentScope() == null) ? false : true;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public int length() {
+        String str = this.identifier;
+        if (str == null) {
+            return 0;
+        }
+        return str.length();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public void setIdentifier(String str) {
+        assertNotNull(str);
+        this.identifier = str;
+        setLength(str.length());
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.mozilla.javascript.Node
+    public void setScope(Scope scope) {
+        this.scope = scope;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.mozilla.javascript.ast.AstNode
+    public String toSource(int i) {
+        String strMakeIndent = makeIndent(i);
+        String str = this.identifier;
+        if (str == null) {
+            str = "<null>";
+        }
+        return strMakeIndent + str;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.mozilla.javascript.ast.AstNode
+    public void visit(NodeVisitor nodeVisitor) {
+        nodeVisitor.visit(this);
+    }
+
+    public Name(int i) {
+        super(i);
+        this.type = 44;
+    }
+
+    public Name(int i, int i2) {
+        super(i, i2);
+        this.type = 44;
+    }
+
+    public Name(int i, int i2, String str) {
+        super(i, i2);
+        this.type = 44;
+        setIdentifier(str);
+    }
+
+    public Name() {
+        this.type = 44;
+    }
+}

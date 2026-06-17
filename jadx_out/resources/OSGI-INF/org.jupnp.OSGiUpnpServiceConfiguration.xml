@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.3.0" name="org.jupnp.OSGiUpnpServiceConfiguration" configuration-policy="require" enabled="false" activate="activate" deactivate="deactivate" configuration-pid="org.jupnp">
+  <service>
+    <provide interface="org.jupnp.UpnpServiceConfiguration"/>
+  </service>
+  <reference name="HttpService" interface="org.osgi.service.http.HttpService" bind="setHttpService" unbind="unsetHttpService"/>
+  <implementation class="org.jupnp.OSGiUpnpServiceConfiguration"/>
+</scr:component>
+

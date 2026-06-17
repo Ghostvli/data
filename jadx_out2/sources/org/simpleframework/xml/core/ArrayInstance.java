@@ -1,0 +1,55 @@
+package org.simpleframework.xml.core;
+
+import java.lang.reflect.Array;
+import org.simpleframework.xml.strategy.Value;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+class ArrayInstance implements Instance {
+    private final int length;
+    private final Class type;
+    private final Value value;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public ArrayInstance(Value value) {
+        this.length = value.getLength();
+        this.type = value.getType();
+        this.value = value;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Instance
+    public Object getInstance() {
+        if (this.value.isReference()) {
+            return this.value.getValue();
+        }
+        Object objNewInstance = Array.newInstance((Class<?>) this.type, this.length);
+        Value value = this.value;
+        if (value != null) {
+            value.setValue(objNewInstance);
+        }
+        return objNewInstance;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Instance
+    public Class getType() {
+        return this.type;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Instance
+    public boolean isReference() {
+        return this.value.isReference();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // org.simpleframework.xml.core.Instance
+    public Object setInstance(Object obj) {
+        Value value = this.value;
+        if (value != null) {
+            value.setValue(obj);
+        }
+        return obj;
+    }
+}

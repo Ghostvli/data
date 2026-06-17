@@ -1,0 +1,26 @@
+package com.github.catvod;
+
+import com.github.catvod.utils.Util;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public class Proxy {
+    private static int port = -1;
+
+    public static int getPort() {
+        return port;
+    }
+
+    public static String getUrl(boolean z) {
+        StringBuilder sb = new StringBuilder("http://");
+        sb.append(z ? "127.0.0.1" : Util.getIp());
+        sb.append(":");
+        sb.append(getPort());
+        sb.append("/proxy");
+        return sb.toString();
+    }
+
+    public static void set(int i) {
+        port = i;
+    }
+}

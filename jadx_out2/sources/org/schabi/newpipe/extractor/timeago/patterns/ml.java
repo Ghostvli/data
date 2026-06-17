@@ -1,0 +1,27 @@
+package org.schabi.newpipe.extractor.timeago.patterns;
+
+import defpackage.t93;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public class ml extends t93 {
+    private static final String WORD_SEPARATOR = "";
+    private static final String[] SECONDS = {"സെക്കന്റ്", "സെക്കൻഡ്"};
+    private static final String[] MINUTES = {"മിനിറ്റ്"};
+    private static final String[] HOURS = {"മണിക്കൂർ"};
+    private static final String[] DAYS = {"ദിവസം"};
+    private static final String[] WEEKS = {"ആഴ്ച", "ആഴ്\u200cച"};
+    private static final String[] MONTHS = {"മാസം"};
+    private static final String[] YEARS = {"വർഷം"};
+    private static final ml INSTANCE = new ml();
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private ml() {
+        super("", SECONDS, MINUTES, HOURS, DAYS, WEEKS, MONTHS, YEARS);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public static ml getInstance() {
+        return INSTANCE;
+    }
+}

@@ -1,0 +1,36 @@
+package net.engio.mbassy.listener;
+
+import net.engio.mbassy.subscription.SubscriptionContext;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+public class Filters {
+
+    /* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+    public static final class RejectSubtypes implements IMessageFilter {
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        @Override // net.engio.mbassy.listener.IMessageFilter
+        public boolean accepts(Object obj, SubscriptionContext subscriptionContext) {
+            for (Class cls : subscriptionContext.getHandler().getHandledMessages()) {
+                if (cls.equals(obj.getClass())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    /* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+    public static final class SubtypesOnly implements IMessageFilter {
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        @Override // net.engio.mbassy.listener.IMessageFilter
+        public boolean accepts(Object obj, SubscriptionContext subscriptionContext) {
+            for (Class cls : subscriptionContext.getHandler().getHandledMessages()) {
+                if (cls.isAssignableFrom(obj.getClass()) && !cls.equals(obj.getClass())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+}

@@ -1,0 +1,52 @@
+package defpackage;
+
+import android.net.Uri;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public final class l81 {
+    public final LinkedHashMap a;
+
+    /* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+    public class a extends LinkedHashMap {
+        public final /* synthetic */ int f;
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        /* JADX WARN: 'super' call moved to the top of the method (can break code semantics) */
+        public a(int i, float f, boolean z, int i2) {
+            super(i, f, z);
+            this.f = i2;
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        @Override // java.util.LinkedHashMap
+        public boolean removeEldestEntry(Map.Entry entry) {
+            return size() > this.f;
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public l81(int i) {
+        this.a = new a(i + 1, 1.0f, false, i);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public byte[] a(Uri uri) {
+        if (uri == null) {
+            return null;
+        }
+        return (byte[]) this.a.get(uri);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public byte[] b(Uri uri, byte[] bArr) {
+        return (byte[]) this.a.put((Uri) gg3.q(uri), (byte[]) gg3.q(bArr));
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public byte[] c(Uri uri) {
+        return (byte[]) this.a.remove(gg3.q(uri));
+    }
+}

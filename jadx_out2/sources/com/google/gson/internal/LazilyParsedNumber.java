@@ -1,0 +1,88 @@
+package com.google.gson.internal;
+
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
+import java.math.BigDecimal;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public final class LazilyParsedNumber extends Number {
+    private final String value;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public LazilyParsedNumber(String str) {
+        this.value = str;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private BigDecimal asBigDecimal() {
+        return NumberLimits.parseBigDecimal(this.value);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private void readObject(ObjectInputStream objectInputStream) throws InvalidObjectException {
+        throw new InvalidObjectException("Deserialization is unsupported");
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private Object writeReplace() {
+        return asBigDecimal();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // java.lang.Number
+    public double doubleValue() {
+        return Double.parseDouble(this.value);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj instanceof LazilyParsedNumber) {
+            return this.value.equals(((LazilyParsedNumber) obj).value);
+        }
+        return false;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // java.lang.Number
+    public float floatValue() {
+        return Float.parseFloat(this.value);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public int hashCode() {
+        return this.value.hashCode();
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // java.lang.Number
+    public int intValue() {
+        try {
+            try {
+                return Integer.parseInt(this.value);
+            } catch (NumberFormatException unused) {
+                return (int) Long.parseLong(this.value);
+            }
+        } catch (NumberFormatException unused2) {
+            return this.asBigDecimal().intValue();
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    @Override // java.lang.Number
+    public long longValue() {
+        try {
+            return Long.parseLong(this.value);
+        } catch (NumberFormatException unused) {
+            return asBigDecimal().longValue();
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public String toString() {
+        return this.value;
+    }
+}

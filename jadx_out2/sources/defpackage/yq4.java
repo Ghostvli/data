@@ -1,0 +1,64 @@
+package defpackage;
+
+import defpackage.gr4;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public final class yq4 {
+    public final boolean a;
+    public final String b;
+    public final gr4.a c;
+    public final int d;
+    public final byte[] e;
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public yq4(boolean z, String str, int i, byte[] bArr, int i2, int i3, byte[] bArr2) {
+        gg3.d((bArr2 == null) ^ (i == 0));
+        this.a = z;
+        this.b = str;
+        this.d = i;
+        this.e = bArr2;
+        this.c = new gr4.a(a(str), bArr, i2, i3);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    /* JADX WARN: Failed to restore switch over string. Please report as a decompilation issue */
+    public static int a(String str) {
+        if (str == null) {
+            return 1;
+        }
+        byte b = -1;
+        switch (str.hashCode()) {
+            case 3046605:
+                if (str.equals("cbc1")) {
+                    b = 0;
+                }
+                break;
+            case 3046671:
+                if (str.equals("cbcs")) {
+                    b = 1;
+                }
+                break;
+            case 3049879:
+                if (str.equals("cenc")) {
+                    b = 2;
+                }
+                break;
+            case 3049895:
+                if (str.equals("cens")) {
+                    b = 3;
+                }
+                break;
+        }
+        switch (b) {
+            case 0:
+            case 1:
+                return 2;
+            default:
+                xz1.i("TrackEncryptionBox", "Unsupported protection scheme type '" + str + "'. Assuming AES-CTR crypto mode.");
+            case 2:
+            case 3:
+                return 1;
+        }
+    }
+}

@@ -1,0 +1,175 @@
+package org.simpleframework.xml.core;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.ElementListUnion;
+import org.simpleframework.xml.ElementMap;
+import org.simpleframework.xml.ElementMapUnion;
+import org.simpleframework.xml.ElementUnion;
+import org.simpleframework.xml.stream.Format;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes3.dex */
+class ExtractorFactory {
+    private final Contact contact;
+    private final Format format;
+    private final Annotation label;
+
+    /* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+    public static class ElementExtractor implements Extractor<Element> {
+        private final Contact contact;
+        private final Format format;
+        private final ElementUnion union;
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        public ElementExtractor(Contact contact, ElementUnion elementUnion, Format format) {
+            this.contact = contact;
+            this.format = format;
+            this.union = elementUnion;
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        /* JADX DEBUG: Method merged with bridge method: getAnnotations()[Ljava/lang/annotation/Annotation; */
+        @Override // org.simpleframework.xml.core.Extractor
+        public Element[] getAnnotations() {
+            return this.union.value();
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        /* JADX DEBUG: Method merged with bridge method: getLabel(Ljava/lang/annotation/Annotation;)Lorg/simpleframework/xml/core/Label; */
+        @Override // org.simpleframework.xml.core.Extractor
+        public Label getLabel(Element element) {
+            return new ElementLabel(this.contact, element, this.format);
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        /* JADX DEBUG: Method merged with bridge method: getType(Ljava/lang/annotation/Annotation;)Ljava/lang/Class; */
+        @Override // org.simpleframework.xml.core.Extractor
+        public Class getType(Element element) {
+            Class clsType = element.type();
+            return clsType == Void.TYPE ? this.contact.getType() : clsType;
+        }
+    }
+
+    /* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+    public static class ExtractorBuilder {
+        private final Class label;
+        private final Class type;
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        public ExtractorBuilder(Class cls, Class cls2) {
+            this.label = cls;
+            this.type = cls2;
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        /* JADX INFO: Access modifiers changed from: private */
+        public Constructor getConstructor() {
+            return this.type.getConstructor(Contact.class, this.label, Format.class);
+        }
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    public ExtractorFactory(Contact contact, Annotation annotation, Format format) {
+        this.contact = contact;
+        this.format = format;
+        this.label = annotation;
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private ExtractorBuilder getBuilder(Annotation annotation) throws PersistenceException {
+        if (annotation instanceof ElementUnion) {
+            return new ExtractorBuilder(ElementUnion.class, ElementExtractor.class);
+        }
+        if (annotation instanceof ElementListUnion) {
+            return new ExtractorBuilder(ElementListUnion.class, ElementListExtractor.class);
+        }
+        if (annotation instanceof ElementMapUnion) {
+            return new ExtractorBuilder(ElementMapUnion.class, ElementMapExtractor.class);
+        }
+        throw new PersistenceException("Annotation %s is not a union", annotation);
+    }
+
+    /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+    private Object getInstance(Annotation annotation) {
+        Constructor constructor = getBuilder(annotation).getConstructor();
+        if (!constructor.isAccessible()) {
+            constructor.setAccessible(true);
+        }
+        return constructor.newInstance(this.contact, annotation, this.format);
+    }
+
+    /* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+    public static class ElementListExtractor implements Extractor<ElementList> {
+        private final Contact contact;
+        private final Format format;
+        private final ElementListUnion union;
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        public ElementListExtractor(Contact contact, ElementListUnion elementListUnion, Format format) {
+            this.contact = contact;
+            this.format = format;
+            this.union = elementListUnion;
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        /* JADX DEBUG: Method merged with bridge method: getAnnotations()[Ljava/lang/annotation/Annotation; */
+        @Override // org.simpleframework.xml.core.Extractor
+        public ElementList[] getAnnotations() {
+            return this.union.value();
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        /* JADX DEBUG: Method merged with bridge method: getLabel(Ljava/lang/annotation/Annotation;)Lorg/simpleframework/xml/core/Label; */
+        @Override // org.simpleframework.xml.core.Extractor
+        public Label getLabel(ElementList elementList) {
+            return new ElementListLabel(this.contact, elementList, this.format);
+        }
+
+        /* JADX DEBUG: Method merged with bridge method: getType(Ljava/lang/annotation/Annotation;)Ljava/lang/Class; */
+        @Override // org.simpleframework.xml.core.Extractor
+        public Class getType(ElementList elementList) {
+            return elementList.type();
+        }
+    }
+
+    /* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+    public static class ElementMapExtractor implements Extractor<ElementMap> {
+        private final Contact contact;
+        private final Format format;
+        private final ElementMapUnion union;
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        public ElementMapExtractor(Contact contact, ElementMapUnion elementMapUnion, Format format) {
+            this.contact = contact;
+            this.format = format;
+            this.union = elementMapUnion;
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        /* JADX DEBUG: Method merged with bridge method: getAnnotations()[Ljava/lang/annotation/Annotation; */
+        @Override // org.simpleframework.xml.core.Extractor
+        public ElementMap[] getAnnotations() {
+            return this.union.value();
+        }
+
+        /* JADX DEBUG: Don't trust debug lines info. Lines numbers was adjusted: min line is 1 */
+        /* JADX DEBUG: Method merged with bridge method: getLabel(Ljava/lang/annotation/Annotation;)Lorg/simpleframework/xml/core/Label; */
+        @Override // org.simpleframework.xml.core.Extractor
+        public Label getLabel(ElementMap elementMap) {
+            return new ElementMapLabel(this.contact, elementMap, this.format);
+        }
+
+        /* JADX DEBUG: Method merged with bridge method: getType(Ljava/lang/annotation/Annotation;)Ljava/lang/Class; */
+        @Override // org.simpleframework.xml.core.Extractor
+        public Class getType(ElementMap elementMap) {
+            return elementMap.valueType();
+        }
+    }
+
+    public Extractor getInstance() {
+        return (Extractor) getInstance(this.label);
+    }
+}

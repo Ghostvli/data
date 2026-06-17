@@ -1,0 +1,43 @@
+package defpackage;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import com.google.android.material.textfield.TextInputEditText;
+
+/* JADX INFO: compiled from: r8-map-id-d258b9486bcf5759e155f5bab92d46ef62bd8d08e8b1f4ee09698e84cf22fec5 */
+/* JADX INFO: loaded from: classes.dex */
+public final class el0 implements i35 {
+    public final FrameLayout a;
+    public final TextInputEditText b;
+
+    public el0(FrameLayout frameLayout, TextInputEditText textInputEditText) {
+        this.a = frameLayout;
+        this.b = textInputEditText;
+    }
+
+    public static el0 a(View view) {
+        int i = nl3.Y0;
+        TextInputEditText textInputEditText = (TextInputEditText) j35.a(view, i);
+        if (textInputEditText != null) {
+            return new el0((FrameLayout) view, textInputEditText);
+        }
+        om1.a("Missing required view with ID: ".concat(view.getResources().getResourceName(i)));
+        return null;
+    }
+
+    public static el0 c(LayoutInflater layoutInflater, ViewGroup viewGroup, boolean z) {
+        View viewInflate = layoutInflater.inflate(fm3.X, viewGroup, false);
+        if (z) {
+            viewGroup.addView(viewInflate);
+        }
+        return a(viewInflate);
+    }
+
+    @Override // defpackage.i35
+    /* JADX INFO: renamed from: b, reason: merged with bridge method [inline-methods] */
+    public FrameLayout getRoot() {
+        return this.a;
+    }
+}
